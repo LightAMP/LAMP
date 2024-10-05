@@ -30,15 +30,15 @@ experiments and generate results in Results folder.
 
 Specifically, the following results can be generated:
 - Fig. 5a, Fig.  5d, Fig. 5g
-  - `C.SC_Baselines('SC_BaseLine',5)`
+  - `C.SC_Baselines('SC_BaseLine',1)`
   - Inputs: <'name of experiment', 'no. of iterations'>
 
 - Fig. 5b, Fig.  5e, Fig. 5h
-  - `C.MC_Baselines('MC_BaseLine',5)`
+  - `C.MC_Baselines('MC_BaseLine',1)`
   - Inputs: <'name of experiment', 'no. of iterations'>
 
 - Fig. 5c, Fig.  5f, Fig. 5i
-  - `C.RM_Baselines('RM_BaseLine',5)`
+  - `C.RM_Baselines('RM_BaseLine',1)`
   - Inputs: <'name of experiment', 'no. of iterations'>
 
 - Fig. 6a, Fig. 6b, Fig. 7c , Fig. 8c
