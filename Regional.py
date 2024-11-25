@@ -329,9 +329,9 @@ class Regional_MixNet(object):
         fig.update_layout(legend=dict(title='Datasets'))
         fig.show() 
         import os        
-        if not os.path.exists("images"):
-            os.mkdir("images")        
-        fig.write_image('images/datasets_Internet_Boundaries_NYM_newdataset_DEC2023_with_number_of_clusters_'+ str(K_cluster)+'.pdf')           
+        #if not os.path.exists("images"):
+            #os.mkdir("images")        
+        #fig.write_image('images/datasets_Internet_Boundaries_NYM_newdataset_DEC2023_with_number_of_clusters_'+ str(K_cluster)+'.pdf')           
         '''
         DATA_LIST = {}
         DATA_LIST['Region1'] = Data['Region5']
@@ -343,7 +343,7 @@ class Regional_MixNet(object):
         return Data
     def Interpolated_NYM(self):
         import matplotlib.pyplot as plt
-        #from mpl_toolkits.basemap import Basemap        
+        from mpl_toolkits.basemap import Basemap        
         import json
         
         with open('Interpolated_NYM_250_DEC_2023.json') as File:
@@ -374,7 +374,7 @@ class Regional_MixNet(object):
                 australia.append(node)
     
         # Plotting on a globe map
-        '''plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(12, 8))
         m = Basemap(projection='mill', llcrnrlat=-60, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, resolution='c')
         m.drawcoastlines()
     
@@ -391,15 +391,7 @@ class Regional_MixNet(object):
         plot_nodes(africa, 'Africa', 'orange')
         plot_nodes(australia, 'Australia', 'cyan')
     
-        # Add legend
-        plt.legend()
-    
-        # Save the image
-    
-        plt.savefig('D:/Approach3/images/Made_up_data.png',format='png', dpi=600)
-    
-        # Show the plot
-        plt.show()'''
+
         Data_ = {}
         Data_['Region1'] = europe
         Data_['Region2'] = north_america
@@ -473,14 +465,14 @@ class Regional_MixNet(object):
         plot_nodes(australia, 'Australia', 'cyan')
     
         # Add legend
-        plt.legend()
+        #plt.legend()
     
         # Save the image
     
-        plt.savefig('D:/Approach3/images/Made_up_data.png',format='png', dpi=600)
+        #plt.savefig('D:/Approach3/images/Made_up_data.png',format='png', dpi=600)
     
         # Show the plot
-        plt.show()
+        #plt.show()
         Data_ = {}
         Data_['Region1'] = europe
         Data_['Region2'] = asia
@@ -2089,7 +2081,199 @@ class Regional_MixNet(object):
         x_name = X_name[2]
         xx_value = 0.5#Becouse we have to region with the same size otherwise G_reginal/sum(G_all_regions)##############
 
+###########################################Global1 + Random ##############################  
         
+        for j in Var:
+            alpha = j       
+            End_to_End_Latancy_Vector = []
+            End_to_End_Latancy_Vector_T = []
+            Message_Entropy_Vector = []            
+            #print(output__['Iteration'+str(1)]['CN'][0])
+            for i in range(len(Dictionaries)):
+                corrupted_Mix = output__['Iteration'+str(i)]['CN'][0][str(alpha)+'Global1']
+                            
+
+                Mix_Dict = {}
+                if x_name[0] == 'G':
+                    
+                    self.G = int(xx_value*len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(1)][0]))
+                else:
+                    self.G = len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(1)][0])
+                    
+                
+                #print(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)])
+                for I in range(self.G):
+
+                    if x_name[0] == 'G':
+                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(I+1)]
+                        
+                    else: 
+                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(I+1)]
+    
+
+
+                if x_name[0] == 'G':
+
+                    self.W = int(len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(1)][0]))
+                else:
+                    self.W = int(len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(1)][0]))                  
+                    
+                
+                for J in range(2*self.W):
+
+                    if x_name[0] == 'G':
+                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(J+1)]
+    
+                    else:
+                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(J+1)]
+                #print(self.G,self.W,'Hi')
+                self.d2 = self.d2*(52/52)
+                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict,self.W,self.G)
+                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
+                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
+                Message_Entropy_Vector = Message_Entropy_Vector + ENT  
+                    
+            Latency_alpha_Uniform.append(End_to_End_Latancy_Vector)
+            Latency_alpha_Uniform_T.append(End_to_End_Latancy_Vector_T)
+            Entropy_alpha_Uniform.append(Message_Entropy_Vector)
+    
+
+
+
+###########################################Global1 + Close ##############################   
+        for j in Var:
+            alpha = j       
+            End_to_End_Latancy_Vector = []
+            End_to_End_Latancy_Vector_T = []
+            Message_Entropy_Vector = []            
+            #print(output__['Iteration'+str(1)]['CN'][0])
+            for i in range(len(Dictionaries)):
+                corrupted_Mix = output__['Iteration'+str(i)]['CN'][1][str(alpha)+'Global1']
+                            
+
+                Mix_Dict = {}
+                if x_name[0] == 'G':
+                    
+                    self.G = int(xx_value*len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(1)][0]))
+                else:
+                    self.G = len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(1)][0])
+                    
+                
+                #print(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)])
+                for I in range(self.G):
+
+                    if x_name[0] == 'G':
+                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(I+1)]
+                        
+                    else: 
+                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(I+1)]
+    
+
+
+                if x_name[0] == 'G':
+
+                    self.W = int(len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(1)][0]))
+                else:
+                    self.W = int(len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(1)][0]))                  
+                    
+                
+                for J in range(2*self.W):
+
+                    if x_name[0] == 'G':
+                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(J+1)]
+    
+                    else:
+                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(J+1)]
+                #print(self.G,self.W,'Hi')
+                self.d2 = self.d2*(52/52)
+                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict,self.W,self.G)
+                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
+                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
+                Message_Entropy_Vector = Message_Entropy_Vector + ENT  
+                    
+            Latency_alpha_Fair.append(End_to_End_Latancy_Vector)
+            Latency_alpha_Fair_T.append(End_to_End_Latancy_Vector_T)
+            Entropy_alpha_Fair.append(Message_Entropy_Vector)
+
+
+
+###########################################Global1 + Greedy ##############################   
+        for j in Var:
+            alpha = j       
+            End_to_End_Latancy_Vector = []
+            End_to_End_Latancy_Vector_T = []
+            Message_Entropy_Vector = []            
+            #print(output__['Iteration'+str(1)]['CN'][0])
+            for i in range(len(Dictionaries)):
+                corrupted_Mix = output__['Iteration'+str(i)]['CN'][2][str(alpha)+'Global1']
+                            
+
+                Mix_Dict = {}
+                if x_name[0] == 'G':
+                    
+                    self.G = int(xx_value*len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(1)][0]))
+                else:
+                    self.G = len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(1)][0])
+                    
+                
+                #print(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)])
+                for I in range(self.G):
+
+                    if x_name[0] == 'G':
+                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(I+1)]
+                        
+                    else: 
+                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(I+1)]
+    
+
+
+                if x_name[0] == 'G':
+
+                    self.W = int(len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(1)][0]))
+                else:
+                    self.W = int(len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(1)][0]))                  
+                    
+                
+                for J in range(2*self.W):
+
+                    if x_name[0] == 'G':
+                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(J+1)]
+    
+                    else:
+                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(J+1)]
+                #print(self.G,self.W,'Hi')
+                self.d2 = self.d2*(52/52)
+                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict,self.W,self.G)
+                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
+                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
+                Message_Entropy_Vector = Message_Entropy_Vector + ENT  
+                    
+            Latency_alpha_LARMIX.append(End_to_End_Latancy_Vector)
+            Latency_alpha_LARMIX_T.append(End_to_End_Latancy_Vector_T)
+            Entropy_alpha_LARMIX.append(Message_Entropy_Vector)
+        
+            
+##################################################################################
+##################################################################################
+            
+
+        labels = [0.0,0.2,0.4,0.6,0.8,1]
+
+###################################################################################            
+#################################Saving the data###################################     
+        df = {'Alpha':labels,
+            'Latency_Uniform' : Latency_alpha_Uniform,
+            'Entropy_Uniform' : Entropy_alpha_Uniform,     
+            'Latency_Fair' : Latency_alpha_Fair,
+            'Entropy_Fair' : Entropy_alpha_Fair, 
+            'Latency_LARMIX' : Latency_alpha_LARMIX,
+            'Entropy_LARMIX' : Entropy_alpha_LARMIX
+                              }
+        import json
+
+        dics = json.dumps(df)
+        with open(File_name + '/'+ 'FCP' +'Sim.json','w') as df_sim:
+            json.dump(dics,df_sim)                
         
         
 
@@ -2316,6 +2500,151 @@ class Regional_MixNet(object):
         
         
         
+    def FCP_Budget(self,Iteration,Name_,Budget):
+        
+        self.Adversary_Budget = Budget
+        import numpy as np
+        import json
+        File_name = Name_        
+        import os         
+        if not os.path.exists(File_name):
+            os.mkdir(os.path.join('', File_name))  
+        Names = ['Global','1','2']
+        Names_ = ['1','2']
+        WW = {'Global':52,'1':39,'2':13}
+        
+        Dictionaries = self.Circles_Creation(Iteration,WW)
+        import numpy as np
+        IT = 'Iteration'
+
+        Var = [0.6]
+        Methods = ['Greedy']
+        output__ = {}
+        for ii in range(Iteration):
+            output__[IT+str(ii)] = {}
+            Dict_FCP = {'output_Greedy_FCP':{}}
+            Dict_CN = {'output_Greedy_CN':{}}
+   
+            
+            for item in Names:
+                
+                if not item == 'Global':
+            
+                    for term in self.Var:
+                        #print(term)
+                        G_dist = []
+                        for k in range(WW[item]):
+                            #print(Dictionaries[IT+str(ii)]['G'+str(k+1)])
+                            
+                            G_dist.append(Dictionaries[IT+str(ii)][item]['tau'+str(term)]['G'+str(k+1)][1])
+                            
+                        G_matrix = np.matrix(G_dist)
+                        G_mean = np.mean(G_matrix,axis=0).tolist()[0]
+                        Input = {}
+                        for i in range(2*WW[item]):
+                            Input['PM' + str(i+1)] = Dictionaries[IT+str(ii)][item]['tau'+str(term)]['PM'+str(i+1)][1]
+                        Dict_output = {}    
+                        for method in Methods:
+                            if not method == 'Close':
+                                Dict_output['output'+method] = self.FCP_Greedy(Input,G_mean,method)
+                                
+    
+                            else:
+                                self.T_data = Dictionaries[IT+str(ii)]['Close']['Region'+item]
+                                Dict_output['output'+method] = self.FCP_Greedy(Input,G_mean,method)
+    
+                            
+                            Dict_FCP['output_' + method +'_FCP'][str(term)+item ]= Dict_output['output'+method][1]
+
+                            Dict_CN['output_' + method +'_CN'][str(term)+item ]= Dict_output['output'+method][0]
+                
+                
+                
+                
+                
+                
+                
+                elif item == 'Global':
+                    
+                    for element in Names_:
+                        
+                        for term in self.Var:
+                            #print(term)
+                            G_dist = []
+                            for k in range(WW[element]):
+                                #print(Dictionaries[IT+str(ii)]['G'+str(k+1)])
+
+                                G_dist.append(Dictionaries[IT+str(ii)][item][element]['tau'+str(term)]['G'+str(k+1)][1])
+                                
+                            G_matrix = np.matrix(G_dist)
+                            G_mean = np.mean(G_matrix,axis=0).tolist()[0]
+                            Input = {}
+                            for i in range(2*WW[item]):
+                                Input['PM' + str(i+1)] = Dictionaries[IT+str(ii)][item][element]['tau'+str(term)]['PM'+str(i+1)][1]
+                            Dict_output = {}    
+                            for method in Methods:
+                                if not method == 'Close':
+                                    Dict_output['output'+method] = self.FCP_Greedy(Input,G_mean,method)
+                                    
+        
+                                else:
+                                    self.T_data = []
+                                    for parts in Names_:
+                                        
+                                        self.T_data.append(Dictionaries[IT+str(ii)]['Close']['Region'+parts])
+                                    Dict_output['output'+method] = self.FCP_Greedy(Input,G_mean,method)
+        
+                                
+                                Dict_FCP['output_' + method +'_FCP'][str(term)+item+element ]= Dict_output['output'+method][1]
+                                Dict_CN['output_' + method +'_CN'][str(term)+item+element ]= Dict_output['output'+method][0]                        
+
+
+            output__[IT+str(ii)]['CN'] = [Dict_CN['output_Greedy_CN'] ]
+            output__[IT+str(ii)]['FCP'] = [Dict_FCP['output_Greedy_FCP']]
+        IDs = ['1','2','Global1','Global2']
+        AVE_FCP = {}
+        for m_name in Methods:
+            AVE_FCP[m_name] = {}
+        for counter in range(len(Methods)):
+            for item in IDs:
+                for term in [0.6]:
+                    A = []
+                    for j in range(Iteration):
+                        b = output__[IT+str(j)]['FCP'][counter][str(term)+item]
+
+                        A.append(b)
+                    A_matrix = np.matrix(A)
+                    A_mean = np.mean(A,axis=0)
+                    AVE_FCP[Methods[counter]][str(term)+item] = A_mean
+                    
+        import numpy as np
+        import json
+        File_name = Name_        
+        import os         
+        if not os.path.exists(File_name):
+            os.mkdir(os.path.join('', File_name))  
+        Names_ = ['Global1','Global2','1','2'] 
+        Y = {} 
+        for m_name in Methods:
+            Y[m_name] = {}
+        for m_name in Methods:
+            for name in Names_:
+                Y[m_name][name] = []
+                for term in [0.6]:
+                    Y[m_name][name].append(AVE_FCP[m_name][str(term)+name])
+                    
+                    
+                    
+        
+
+
+        self.Simulation_FCP = output__
+        FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
+        #return AVE_FCP
+        
+        import json
+        with open(File_name+'/FCP_Data.json','w') as file:
+            json.dump(FCP_Dicts,file)
         
         
         

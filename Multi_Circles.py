@@ -1459,12 +1459,286 @@ class CircularMixNet_MC(object):
 
 
 
+##########################Simulations#######################################################         
+        Latency_alpha_Uniform = []
+        Latency_alpha_Uniform_T = []    
+        Entropy_alpha_Uniform = []
+        Latency_alpha_Fair = []
+        Latency_alpha_Fair_T = []    
+        Entropy_alpha_Fair = []
+        Latency_alpha_LARMIX = []
+        Latency_alpha_LARMIX_T = []    
+        Entropy_alpha_LARMIX = []
+        corrupted_Mix = {}
+
+        for k in range(self.N):
+            corrupted_Mix['PM'+str(k+1)] = False
+
+
+###########################################Larmix0.6 + Random ##############################   
+        for j in range(6):
+            alpha = self.Var[j]       
+            End_to_End_Latancy_Vector = []
+            End_to_End_Latancy_Vector_T = []
+            Message_Entropy_Vector = []            
+
+            for i in range(len(Dictionaries)):
+                corrupted_Mix = output__['Iteration'+str(i)]['CN'][0][str(alpha)+'LARMIX0.9']
+                            
+
+                Mix_Dict = {}
+                for I in range(self.G):
+                    Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['G'+str(I+1)][str(alpha)+'LARMIX0.9']
+                for J in range(2*self.W):
+                    Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['PM'+str(J+1)][str(alpha)+'LARMIX0.9']
+
+
+
+                    
+                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict)
+                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
+                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
+                Message_Entropy_Vector = Message_Entropy_Vector + ENT  
+                    
+            Latency_alpha_Uniform.append(End_to_End_Latancy_Vector)
+            Latency_alpha_Uniform_T.append(End_to_End_Latancy_Vector_T)
+            Entropy_alpha_Uniform.append(Message_Entropy_Vector)
+
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+###########################################Close + Larmix0.6 ##############################   
+        for j in range(6):
+            alpha = self.Var[j]       
+            End_to_End_Latancy_Vector = []
+            End_to_End_Latancy_Vector_T = []
+            Message_Entropy_Vector = []            
+
+            for i in range(len(Dictionaries)):
+                corrupted_Mix = output__['Iteration'+str(i)]['CN'][1][str(alpha)+'LARMIX0.9']                            
+
+                Mix_Dict = {}
+                for I in range(self.G):
+                    Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['G'+str(I+1)][str(alpha)+'LARMIX0.9']
+                for J in range(2*self.W):
+                    Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['PM'+str(J+1)][str(alpha)+'LARMIX0.9']
+
+
+               
+                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict)
+                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
+                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
+                Message_Entropy_Vector = Message_Entropy_Vector + ENT       
+            Latency_alpha_Fair.append(End_to_End_Latancy_Vector)
+            Latency_alpha_Fair_T.append(End_to_End_Latancy_Vector_T)
+            Entropy_alpha_Fair.append(Message_Entropy_Vector)
+            
+            
+            
+            
+###########################################Greedy + LARMIX0.6 ##############################   
+        for j in range(6):
+            alpha = self.Var[j]      
+            End_to_End_Latancy_Vector = []
+            End_to_End_Latancy_Vector_T = []
+            Message_Entropy_Vector = []            
+
+            for i in range(len(Dictionaries)):
+                corrupted_Mix = output__['Iteration'+str(i)]['CN'][2][str(alpha)+'LARMIX0.9']                            
+
+                Mix_Dict = {}
+                for I in range(self.G):
+                    Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['G'+str(I+1)][str(alpha)+'LARMIX0.9']
+                for J in range(2*self.W):
+                    Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['PM'+str(J+1)][str(alpha)+'LARMIX0.9']
+
+
+
+                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict)
+                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
+                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
+                Message_Entropy_Vector = Message_Entropy_Vector + ENT       
+            Latency_alpha_LARMIX.append(End_to_End_Latancy_Vector)
+            Latency_alpha_LARMIX_T.append(End_to_End_Latancy_Vector_T)
+            Entropy_alpha_LARMIX.append(Message_Entropy_Vector)
+            
+            
+            
+            
+            
+            
+            
+            
+            
+##################################################################################
+##################################################################################
+            
+
+        labels = [0.001,0.007,0.015,0.030,0.05,0.1]
+        '''
+        for Tau in np.arange(0,1.01,0.2):            
+            T = round(100*Tau)/100
+            labels.append(T)       
+        for i in range(len(labels)):
+          
+            labels[i] = int(labels[i]*100)/100
+            '''
+###################################################################################            
+#################################Saving the data###################################     
+        df = {'Alpha':labels,
+            'Latency_Uniform' : Latency_alpha_Uniform,
+            'Entropy_Uniform' : Entropy_alpha_Uniform,     
+            'Latency_Fair' : Latency_alpha_Fair,
+            'Entropy_Fair' : Entropy_alpha_Fair, 
+            'Latency_LARMIX' : Latency_alpha_LARMIX,
+            'Entropy_LARMIX' : Entropy_alpha_LARMIX
+                              }
+        import json
+
+        dics = json.dumps(df)
+        with open(File_name + '/'+ 'FCP' +'Sim.json','w') as df_sim:
+            json.dump(dics,df_sim)        
+        
+        
+        
+        
+        D = ['Random','Single Location','Worst Case']
+##################################Plots##################################################           
+        Y = [Latency_alpha_Uniform ,Latency_alpha_Fair, Latency_alpha_LARMIX ]
+        Y_Label = 'Latency (sec)'
+        X_Label = 'Radius of cells' +r'$\alpha = 0.02 $'
+        Name = File_name + '/' + 'FCP_Latency.png'
+        from Plot import PLOT
+        PLT = PLOT(labels,Y,D,X_Label,Y_Label,Name)
+        PLT.Box_Plot(1,True)
+        
+        
+        Y = [Entropy_alpha_Uniform ,Entropy_alpha_Fair, Entropy_alpha_LARMIX ]
+        Y_Label = 'Entropy (bits)'
+        Name = File_name + '/' +'FCP_Entropy.png'
+        PLT = PLOT(labels,Y,D,X_Label,Y_Label,Name)
+        PLT.Box_Plot(15,True)
+
+
+
+#################################################################################################
 
 
 
 
 
 
+    def FCP_Budget(self,Iteration,Name_,Budget,Common=False):
+        import numpy as np
+        self.Adversary_Budget = Budget
+        IT = 'Iteration'
+        Dictionaries = self.PreProcessing(Iteration,Name_,Common)
+        Var = [0.01]
+        Names = ['Uniform','Fair','LARMIX0.3','LARMIX','LARMIX0.9']
+        Names__ = ['LARMIX0.3','LARMIX','Fair','LARMIX0.9','Uniform']
+        Methods = ['Greedy']
+        output__ = {}
+        for ii in range(Iteration):
+            output__[IT+str(ii)] = {}
+            Dict_FCP = {'output_Greedy_FCP':{}}
+            Dict_CN = {'output_Greedy_CN':{}}
+   
+            
+            for item in Names:
+            
+                for term in Var:
+                    #print(term)
+                    G_dist = []
+                    for k in range(self.W):
+                        #print(Dictionaries[IT+str(ii)]['G'+str(k+1)])
+
+                        #for key in Dictionaries[IT+str(ii)]['G'+str(k+1)]:
+                            #print(key)
+                        G_dist.append(Dictionaries[IT+str(ii)]['G'+str(k+1)][str(term)+item][1])
+                        
+                    G_matrix = np.matrix(G_dist)
+                    G_mean = np.mean(G_matrix,axis=0).tolist()[0]
+                    Input = {}
+                    for i in range(2*self.W):
+                        Input['PM' + str(i+1)] = Dictionaries[IT+str(ii)]['PM'+str(i+1)][str(term)+item][1]
+                    Dict_output = {}    
+                    for method in Methods:
+                        if not method == 'Close':
+                            Dict_output['output'+method] = self.FCP_Greedy(Input,G_mean,method)
+                            
+
+                        else:
+                            self.T_data = Dictionaries[IT+str(ii)]['Close']
+                            Dict_output['output'+method] = self.FCP_Greedy(Input,G_mean,method)
+
+                        
+                        Dict_FCP['output_' + method +'_FCP'][str(term)+item ]= Dict_output['output'+method][1]
+                        Dict_CN['output_' + method +'_CN'][str(term)+item ]= Dict_output['output'+method][0]
+
+
+            output__[IT+str(ii)]['CN'] = [Dict_CN['output_Greedy_CN'] ]
+            output__[IT+str(ii)]['FCP'] = [Dict_FCP['output_Greedy_FCP']]
+            
+        AVE_FCP = {}
+        for m_name in Methods:
+            AVE_FCP[m_name] = {}
+        for counter in range(len(Methods)):
+            for item in Names:
+                for term in Var:
+                    A = []
+                    for j in range(Iteration):
+                        
+                        
+                            
+                        b = output__[IT+str(j)]['FCP'][counter][str(term)+item]
+
+                        A.append(b)
+                    A_matrix = np.matrix(A)
+                    A_mean = np.mean(A,axis=0)
+                    AVE_FCP[Methods[counter]][str(term)+item] = A_mean
+
+        import numpy as np
+        import json
+        File_name = Name_        
+        import os         
+        if not os.path.exists(File_name):
+            os.mkdir(os.path.join('', File_name))  
+
+        Y = {} 
+        for m_name in Methods:
+            Y[m_name] = {}
+        for m_name in Methods:
+            for name in Names__:
+                Y[m_name][name] = []
+                for term in [0.01]:
+                    Y[m_name][name].append(AVE_FCP[m_name][str(term)+name])
+                    
+                    
+                    
+
+        FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
+        #return AVE_FCP
+                     
+                
+        self.Simulation_FCP = output__
+        FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
+        #return AVE_FCP
+        
+        import json
+        with open(File_name+'/FCP_Data.json','w') as file:
+            json.dump(FCP_Dicts,file)
 
 
 

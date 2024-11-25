@@ -1,77 +1,59 @@
 """
 Main File: In this file we evaluate LAMP
 """
-
             
-from LAMP import LAMP
-C = LAMP()
-#To evaluate LAMP, the first step is to configure a mixed network using the following function.
-# Note that the number of iterations used for this configuration should not be exceeded in other experiments. 
-#For example, if the iteration count is set to 10 in the initial configuration, 
-#subsequent experiments should also use a maximum of 10 iterations.
-C.data_initialization(50)
+
+from Main_functions import Main_functions
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+# If you wish to generate all the figures described in the artifact appendix please rune the current “.py” 
+#file with the outlined input.
+
+#Input = 0
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#If you want to run different experiments separately  please consider the following instruction to set the input parameters.
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#.............................E1 and E2 for 1st and 2nd claims.......................................................
+
+#Input = 12
+
+#.............................E3 to support claim 3..................................................................
+
+#Input = 3
+
+#.............................E4 to support cliam 4..................................................................
+
+#Input = 4
+
+#.............................Figure 5...............................................................................
+
+#Input = 5
+
+#.............................Figure 6...............................................................................
+
+#Input = 6
+
+#.............................Figure 7...............................................................................
+
+#Input = 7
+
+#.............................Figure 8...............................................................................
+
+#Input = 8
+
+#.............................Figure 9.................................................................................
+
+#Input = 9
 
 
-#Fig 5a, 5d.
-#The function takes two arguments: the first argument is used to specify the name of the experiment, 
-#the second argument represents the number of iterations 
-
-C.SC_Baselines('SC_BaseLine',5)
-
-
-#Fig 5b, 5e.
-#The function takes two arguments: the first argument is used to specify the name of the experiment, 
-#the second argument represents the number of iterations 
-C.MC_Baselines('MC_BaseLine',2)
-
-
-#Fig 5c, 5f.
-#The function takes two arguments: the first argument is used to specify the name of the experiment, 
-#the second argument represents the number of iterations 
-C.RM_Baselines('RM_BaseLine',5)
-
-
-
-#Fig 6a, 6b. Fig 8c
-#The function takes two arguments: the first argument is used to specify the name of the experiment, 
-#the second argument represents the number of iterations 
-
-C.RM_Simulations_FCP('RM_Simulations_and_FCP',10)
-
-
-
-#Fig 8a
-#The function takes two arguments: the first argument is used to specify the name of the experiment, 
-#the second argument represents the number of iterations 
-
-C.SC_Simulation_FCP('SC_Simulation_and_FCP',50)
-
-
-#Fig 8b
-#The function takes two arguments: the first argument is used to specify the name of the experiment, 
-#the second argument represents the number of iterations 
-
-C.MC_Simulation_FCP('MC_Simulation_and_FCP',50)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Input = input('Please enter the Input parameter: ')
+Main_C = Main_functions(Input)
 
 
 
