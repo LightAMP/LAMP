@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    plot
+    plot: To provide templates for the figures to be plotted
 """
 def compatible(A,B):
     print(A)

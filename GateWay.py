@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Gateway
+Gateway: It's a class to provide the gateways(clients) action in mixnets
 """
 
 

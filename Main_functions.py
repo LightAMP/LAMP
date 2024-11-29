@@ -1,3 +1,8 @@
+"""
+This file automates the execution of experiments by introducing conditional controls with integer arguments, 
+simplifying the process of running different experiments.
+"""
+
 from LAMP import LAMP
 import os
 
@@ -6,15 +11,12 @@ class Main_functions(object):
     
     def __init__(self,Fun,State = False):
         
-        #assert Iterations <201, 'The maximum number of iterations should not exceed 200'
     
         self.Fun = Fun
         self.It = 25
         
 
         if not ( os.path.exists("LARMIX__2.json") and os.path.exists("LARMIX__2.json") and os.path.exists("LARMIX.json") ):
-            
-            
 
             C = LAMP()
             #To evaluate LAMP, the first step is to configure a mixed network using the following function.
@@ -200,9 +202,23 @@ class Main_functions(object):
   
             C.RM_Budget_FCP('RM_FCP_Budget',25)
             
+            
+        elif self.Fun==22:
+            
+            #Table2
+            #The function takes two arguments: the first argument is used to specify the name of the experiment, 
+            #the second argument represents the number of iterations 
+            C = LAMP()
+            C.Table_2('Table_2',10)            
 
 
-
+        elif self.Fun==33:
+            
+            #Table3
+            #The function takes two arguments: the first argument is used to specify the name of the experiment, 
+            #the second argument represents the number of iterations 
+            C = LAMP()
+            C.Table_3('Table_3',10)   
 
 
 

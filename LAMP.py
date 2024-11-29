@@ -1,14 +1,32 @@
+"""
+LAMP:
+    
+The evaluation of LAMP consists of various approaches and functions designed to develop and validate the experimental results. 
+This file consolidates all these experiments in a functional format, facilitating the execution and analysis of the evaluations. 
+Additionally, it provides tools to plot the resulting data for better visualization and interpretation.
+
+
+"""
+
+
+
+
 from Multi_Circles import CircularMixNet_MC
 from Single_Circle import CircularMixNet_SC
-import numpy as np
 from Regional import Regional_MixNet
+from data0 import MakeData
+from Plot import PLOT
+import os 
+import json
+import pickle
+import numpy as np
+
 
 def polynomial_extrapolation(X, Y, x_extrapolate, degree=2):
     if len(X) != len(Y):
         raise ValueError("The lists X and Y must have the same length.")
     if len(X) < 2:
-        raise ValueError("The lists X and Y must have at least two points for extrapolation.")
-    
+        raise ValueError("The lists X and Y must have at least two points for extrapolation.")   
     # Sort the data points by X values
     sorted_points = sorted(zip(X, Y))
     X, Y = zip(*sorted_points)
@@ -39,42 +57,25 @@ class LAMP(object):
         self.Percentile = [50,95]        
         
         
-    def data_initialization(self,Iterations):
-        import os         
+    def data_initialization(self,Iterations):        
         if not os.path.exists('Results'):
             os.mkdir(os.path.join('', 'Results'))   
-        from data0 import MakeData
-        
-        
-        Class = MakeData(self.W, Iterations)
-        
+        Class = MakeData(self.W, Iterations)       
         Class.Common_Data()
         
         
     def SC_Baselines(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
-
-        Class_SC = CircularMixNet_SC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
         
+        Class_SC = CircularMixNet_SC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
         Class_SC.EL_Analysis(Name_File,Iterations,True)        
         
-        #################################BaseLine####Approach2#################################################
+        #################################BaseLine#################################################
         #######################################################################################################
-        
-        
-        from Plot import PLOT
-        
-        
         X_L = r'Radius $r$ (ms)'
         Y_t = 'Entropy/Latency'
         Y_E = "Entropy (bits)"
-        Y_L = 'Latency (sec)'
-        
-        D = ['Uniform',r'LARMix $\tau=0.9$','Proportional',r'LARMix $\tau=0.6$',r'LARMix $\tau=0.3$']
-            
+        Y_L = 'Latency (sec)'       
+        D = ['Uniform',r'LARMix $\tau=0.9$','Proportional',r'LARMix $\tau=0.6$',r'LARMix $\tau=0.3$']            
         Name_E_A2 = 'Results' + '/' +'Fig_5a.png'
         
         Name_L_A2 = 'Results' + '/' +'Fig_5d.png'
@@ -83,18 +84,15 @@ class LAMP(object):
         
         ######################################################################################################
         ######################################################################################################
-        import pickle
+        
         File_name = Name_File
         with open(File_name + '/'+'Analytical.pkl', 'rb') as file:
             # Serialize and save your data to the file
             a = pickle.load(file)
-            
-        
-            
+
         Tau = a['Alpha']
         for i in range(len(Tau)):
             Tau[i] = Tau[i]*1000
-        
         Entropy = a['Entropy']
         x1 = Entropy[1]
         x2 = Entropy[2]
@@ -102,8 +100,6 @@ class LAMP(object):
         Entropy[2] = x1
         PLT_E = PLOT(Tau,Entropy,D,X_L,Y_E,Name_E_A2)
         PLT_E.scatter_line(True,10)
-        
-        
         
         
         Latency = a['Latency']
@@ -161,10 +157,6 @@ class LAMP(object):
         PLT_t.colors[4] = c3
         
         
-         
-        
-        
-        
         p1 = PLT_t.Line_style[0] 
         p2 = PLT_t.Line_style[1] 
         p3 = PLT_t.Line_style[2] 
@@ -176,29 +168,16 @@ class LAMP(object):
         PLT_t.Line_style[3] = p1
         PLT_t.Line_style[4] = p3
         
-        
-        
         PLT_t.scatter_line(True,270)                
                 
         
         
     def MC_Baselines(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
 
         Class_MC = CircularMixNet_MC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
-        
         Class_MC.EL_Analysis(Name_File,Iterations,True)
     
-        #################################BaseLine####Approach1#################################################
-        
-        
-        
-        from Plot import PLOT
-        
-        
+        #################################BaseLine1#################################################
         X_L = r'Radius $r$ (ms)'
         Y_t = 'Entropy/Latency'
         Y_E = "Entropy (bits)"
@@ -214,14 +193,11 @@ class LAMP(object):
         
         ######################################################################################################
         ######################################################################################################
-        import pickle
+        
         File_name = Name_File
         with open(File_name + '/'+'Analytical.pkl', 'rb') as file:
             # Serialize and save your data to the file
             a = pickle.load(file)
-            
-        
-            
         Tau = a['Alpha']
         Tau = [1/1000,7/1000,15/1000,30/1000,50/1000,100/1000]
         for i in range(len(Tau)):
@@ -236,14 +212,11 @@ class LAMP(object):
         for i in range(len(Entropy)):
             y[i] = Entropy[i][:5]
         x = Tau[:5]
-        
-        
+
         PLT_E = PLOT(x,y,D,X_L,Y_E,Name_E_A1)
         PLT_E.scatter_line(True,10)
         
-        
-        
-        
+
         Latency = a['Latency']
         y = [[]]*5
         for i in range(len(Entropy)):
@@ -251,16 +224,12 @@ class LAMP(object):
         x = Tau[:5]
         PLT_L = PLOT(x,y,D,X_L,Y_L,Name_L_A1)
         PLT_L.scatter_line(True,0.18)
-        
-        D = [r'LARMix $\tau=0.6$','Proportional',r'LARMix $\tau=0.9$','Uniform',r'LARMix $\tau=0.3$']
-        #['royalblue','red','green','fuchsia','cyan','indigo','teal','lime','blue','black','orange','violet','lightblue']
-               # self.Line_style = ['-',':','--','-.','--','-',':','--','-.','--']  
+        D = [r'LARMix $\tau=0.6$','Proportional',r'LARMix $\tau=0.9$','Uniform',r'LARMix $\tau=0.3$'] 
         Frac = []
         for j in range(len(D)):
             
             Frac.append([Entropy[j][i]/Latency[j][i] for i in range(len(Tau))])
-            
-        
+ 
         f1 = Frac[0] 
         f2 = Frac[1]
         f3 = Frac[2]
@@ -292,10 +261,6 @@ class LAMP(object):
         PLT_t.colors[4] = c5
         
         
-         
-        
-        
-        
         p1 = PLT_t.Line_style[0] 
         p2 = PLT_t.Line_style[1] 
         p3 = PLT_t.Line_style[2] 
@@ -306,9 +271,7 @@ class LAMP(object):
         PLT_t.Line_style[2] = p2
         PLT_t.Line_style[3] = p1
         PLT_t.Line_style[4] = p5
-        
-        
-        
+
         PLT_t.scatter_line(True,270)
 
 
@@ -316,31 +279,18 @@ class LAMP(object):
 
         
     def RM_Baselines(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
-
         Class_RM = Regional_MixNet(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
-        
         Class_RM.EL_Analysis1(Name_File,Iterations,2)  
         
-        #################################BaseLine####Approach3#################################################
+        #################################BaseLine####################################################
         ######################################################################################################
         ######################################################################################################
-        
-        
-        from Plot import PLOT
-        
-        
         X_L = r'Randomness $\tau$'
         Y_t = 'Entropy/Latency'
         Y_E = "Entropy (bits)"
         Y_L = 'Latency (sec)'
         
         D = ['Global Mixnet','EU Mixnet','NA Mixnet']
-        
-            
         Name_E_A3 = 'Results' + '/' +'Fig_5c.png'
         
         Name_L_A3 = 'Results' + '/' +'Fig_5f.png'
@@ -349,32 +299,22 @@ class LAMP(object):
         
         ######################################################################################################
         ######################################################################################################
-        import pickle
         File_name = Name_File
         with open(File_name + '/'+'data_Analytic.pkl', 'rb') as file:
             # Serialize and save your data to the file
             a = pickle.load(file)
-            
-        
-            
         Tau = a['Alpha']
-        
-        
+
         Entropy = a['Entropy']
         
         PLT_E = PLOT(Tau,Entropy,D,X_L,Y_E,Name_E_A3)
         PLT_E.scatter_line(True,10)
         
-        
         D = ['NA Mixnet + NA Clients','Global Mixnet + NA Clients','Global Mixnet + EU Clients','EU Mixnet + EU Clients']
         
         Latency = a['Latency']
         PLT_t = PLOT(Tau,Latency,D,X_L,Y_L,Name_L_A3)
-        
-        
-        #print(PLT_t.colors)
-        
-        
+
         f1 = Latency[0] 
         f2 = Latency[1]
         f3 = Latency[2]
@@ -395,9 +335,7 @@ class LAMP(object):
         PLT_t.colors[1] = c5
         PLT_t.colors[2] = c1
         PLT_t.colors[3] = c2
-        #print(PLT_t.colors)
-        
-        
+
         p1 = PLT_t.Line_style[0] 
         p2 = PLT_t.Line_style[1] 
         p3 = PLT_t.Line_style[2] 
@@ -414,15 +352,10 @@ class LAMP(object):
         
         
         Latency = a['Latency']
-        
-        
-        
-        
-        
+
         
         D = ['EU Mixnet + EU Clients','Global Mixnet + EU Clients','Global Mixnet + NA Clients','NA Mixnet + NA Clients']
-        #['royalblue','red','green','fuchsia','cyan','indigo','teal','lime','blue','black','orange','violet','lightblue']
-               # self.Line_style = ['-',':','--','-.','--','-',':','--','-.','--']
+
         Entropy_=[]
         for i in range(len(Entropy)):
             if i==0:
@@ -457,8 +390,7 @@ class LAMP(object):
         PLT_t.colors[1] = c1
         PLT_t.colors[2] = c5
         PLT_t.colors[3] = c3
-        #print(PLT_t.colors)
-        
+
         
         p1 = PLT_t.Line_style[0] 
         p2 = PLT_t.Line_style[1] 
@@ -481,25 +413,17 @@ class LAMP(object):
 
 
     def RM_Simulations_FCP(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
 
         Class_RM = Regional_MixNet(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
-        
         Class_RM.FCP(Iterations,Name_File)
 
         #############################################################################################
         ####################################Simulations: Fig 6a and Fig6b##############################################
         #############################################################################################
         #############################################################################################
-        import json
-        
+
         with open(Name_File+'/FCPSim_simple.json','r') as file:
             data0 = json.loads(json.load(file))
-             
-                
         Name_E_S3 = 'Results' + '/' +'Fig_6a.png'
         
         Name_L_S3 = 'Results' + '/' +'Fig_6b.png'
@@ -514,25 +438,16 @@ class LAMP(object):
         Y_Label_L = 'Latency (sec)'
         Y_Label_E = 'Entropy (bits)'
         X_Label = r'Randomness $\tau$ ' 
-        
-        from Plot import PLOT
-        PLT = PLOT(Aa,Y_E,D,X_Label,Y_Label_E,Name_E_S3)
-        
+
+        PLT = PLOT(Aa,Y_E,D,X_Label,Y_Label_E,Name_E_S3)       
         PLT.Box_Plot(13,True)
-        
-        
+
         PLT = PLOT(Aa,Y_L,D,X_Label,Y_Label_L,Name_L_S3)
         PLT.Box_Plot(0.8,True)
 
         ########################################################################################
         ###########################################Fig_8c######################################
         ########################################################################################
-
-        
-        
-        from Plot import PLOT
-        
-        
         X_L = r'Randomness $\tau$ '
         
         Y_f = "FCP"
@@ -543,21 +458,15 @@ class LAMP(object):
         Name_FCP_A3 = 'Results' + '/' +'Fig_8c.png'
         
         Name_FCP_S3 = 'Results' + '/' +'Fig_7c.png'
-        
-        
+
         
         ######################################################################################################
         ######################################################################################################
-        import json
         File_name = Name_File+'/FCP_Data.json'
         with open(File_name , 'r') as file:
             # Serialize and save your data to the file
             a = json.load(file)
             
-         
-        
-        
-        
         Y_FCP = []
         for item in a['FCP']['Greedy']:
             Y_FCP.append(a['FCP']['Greedy'][item])
@@ -588,15 +497,12 @@ class LAMP(object):
         #############################################################################################
         ###################################################################################
         #############################################################################################
-        import json
         File_name = Name_File+'/FCPSim.json'
         with open(File_name , 'r') as file:
             # Serialize and save your data to the file
             data0 = json.loads(json.load(file))    
             
-             
-        
-        
+
         Aa = data0['Alpha']
         
         Y_E = [data0['Entropy_Uniform'],data0['Entropy_Fair'],data0['Entropy_LARMIX']]
@@ -616,17 +522,10 @@ class LAMP(object):
 
     
     def SC_Simulation_FCP(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
 
         Class_SC = CircularMixNet_SC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
-        
         Class_SC.FCP(Iterations,Name_File,True)     
 
-
-        
         ##########################################################################################
         #########################################################################################
         #################################FCP SC#################################################
@@ -635,11 +534,7 @@ class LAMP(object):
         ##########################################################################################
         #########################################################################################
         ##########################################################################################
-        #########################################################################################
-        
-        
-        from Plot import PLOT
-        
+
         
         X_L = r'Radius $r$ (ms)'
         
@@ -656,7 +551,6 @@ class LAMP(object):
         
         ######################################################################################################
         ######################################################################################################
-        import json
         File_name = Name_File+'/FCP_Data.json'
         with open(File_name , 'r') as file:
         # Serialize and save your data to the file
@@ -683,14 +577,11 @@ class LAMP(object):
         #############################################################################################
         ###################################################################################
         #############################################################################################
-        import json
         File_name =Name_File+'/FCPSim.json'
         with open(File_name , 'r') as file:
         # Serialize and save your data to the file
             data0 = json.loads(json.load(file))    
-        
-         
-        
+
         
         Aa = data0['Alpha']
         Aa = data0['Alpha']
@@ -714,13 +605,7 @@ class LAMP(object):
 
 
     def MC_Simulation_FCP(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
-
         Class_MC = CircularMixNet_MC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
-        
         Class_MC.FCP(Iterations,Name_File,True)     
 
 
@@ -734,11 +619,7 @@ class LAMP(object):
         #########################################################################################
         ##########################################################################################
         #########################################################################################
-        
-        
-        from Plot import PLOT
-        
-        
+
         X_L = r'Radius $r$ (ms)'
         
         Y_f = "FCP"
@@ -754,7 +635,6 @@ class LAMP(object):
         
         ######################################################################################################
         ######################################################################################################
-        import json
         File_name = Name_File+'/FCP_Data.json'
         with open(File_name , 'r') as file:
         # Serialize and save your data to the file
@@ -787,9 +667,7 @@ class LAMP(object):
         # Serialize and save your data to the file
             data0 = json.loads(json.load(file))    
         
-         
-        
-        
+
         Aa = data0['Alpha']
         Aa = data0['Alpha']
         for i in range(len(Aa)):
@@ -802,27 +680,17 @@ class LAMP(object):
         Y_Label_E = 'Entropy (bits)'
         X_Label = r'Radius $r$ ms' 
         
-        
-        
+
         PLT = PLOT(Aa,Y_E,D,X_Label,Y_Label_E,Name_FCP_S2,True,False,False,True)
         PLT.Box_Plot(15,True)
         
-        
-        
-
-
-
 
 
 
     
     def SC_Budget_FCP(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
-
         Class_SC = CircularMixNet_SC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
 
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
         
         Budget = [5,10,15,20]
         
@@ -859,24 +727,15 @@ class LAMP(object):
             a = json.load(file)
             
         Keys = list(a['FCP'][Method].keys())
-        #print(Keys)
         New_Data = {}
         for item in Keys:
             New_Data[item] = []
         
         Y_FCP = [[],[],[],[],[]]
-        #print(Y_FCP)
         for i in range(len(Y_FCP)):
-            #print(i,Y_FCP[i])
             next_x = a['FCP'][Method][Keys[i]][0]
-            #print(next_x,type(next_x))
             Y_FCP[i].append( next_x)
-        
-            
-        
-        #print(Y_FCP)
-        
-        #print('ok')
+
         ######################################################################################################
         ######################################################################################################
         import json
@@ -919,23 +778,15 @@ class LAMP(object):
 
 
     def MC_Budget_FCP(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
 
         Class_MC = CircularMixNet_MC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
 
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
         
         Budget = [5,10,15,20]
         
         for i in range(3):
-            
-        
+
             Class_MC.FCP_Budget(Iterations,Name_File+str(Budget[i+1]),Budget[i+1],True)     
-
-
-        
-
         Method = 'Greedy'
         
         from Plot import PLOT
@@ -961,28 +812,17 @@ class LAMP(object):
         with open(File_name , 'r') as file:
             # Serialize and save your data to the file
             a = json.load(file)
-            
-        #print(list(a['FCP'].keys()))
-            
+
         Keys = list(a['FCP'][Method].keys())
-        #print(Keys)
         New_Data = {}
         for item in Keys:
             New_Data[item] = []
         
         Y_FCP = [[],[],[],[],[]]
-        #print(Y_FCP)
         for i in range(len(Y_FCP)):
-            #print(i,Y_FCP[i])
             next_x = a['FCP'][Method][Keys[i]][0]
-            #print(next_x,type(next_x))
             Y_FCP[i].append( next_x)
-        
-            
-        
-        #print(Y_FCP)
-        
-        
+
         ######################################################################################################
         ######################################################################################################
         import json
@@ -1004,11 +844,7 @@ class LAMP(object):
             a = json.load(file)
             
         for i in range(len(Y_FCP)):
-            Y_FCP[i].append(a['FCP'][Method][Keys[i]][0])
-        
-        #print(Y_FCP)
-        
-        
+            Y_FCP[i].append(a['FCP'][Method][Keys[i]][0])        
         Y_B = [[],[],[],[],[]]
         
         
@@ -1027,12 +863,8 @@ class LAMP(object):
 
 
     def RM_Budget_FCP(self,Name_File,Iterations):
-        #from Multi_Circles import CircularMixNet
 
         Class_RM =  Regional_MixNet(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
-
-
-        #Sim.EL_Analysis('BaseLine'+str(W)+'Nodes_per_Layers',40,True)
         
         Budget = [5,17,25,30]
         
@@ -1041,8 +873,6 @@ class LAMP(object):
         
             Class_RM.FCP_Budget(Iterations,Name_File+str(Budget[i+1]),Budget[i+1])     
 
-
-        
 
         Method = 'Greedy'
         
@@ -1068,10 +898,7 @@ class LAMP(object):
         with open(File_name , 'r') as file:
             # Serialize and save your data to the file
             a = json.load(file)
-            
-         
-        
-        
+
         
         Y_FCP = []
         for item in a['FCP'][Method]:
@@ -1088,11 +915,8 @@ class LAMP(object):
         Y_FCP[3] = y2
         
         Y_FCP_ = [[],[],[],[]]
-        #print(Y_FCP)
         for i in range(len(Y_FCP)):
-            #print(i,Y_FCP[i])
             next_x = Y_FCP[i][0]
-            #print(next_x,type(next_x))
             Y_FCP_[i].append( next_x)
         
         
@@ -1108,10 +932,7 @@ class LAMP(object):
             # Serialize and save your data to the file
             a = json.load(file)
             
-         
-        
-        
-        
+
         Y_FCP = []
         for item in a['FCP'][Method]:
             Y_FCP.append(a['FCP'][Method][item])
@@ -1128,32 +949,18 @@ class LAMP(object):
         
         
         for i in range(len(Y_FCP)):
-            #print(i,Y_FCP[i])
             next_x = Y_FCP[i][0]
-            #print(next_x,type(next_x))
             Y_FCP_[i].append( next_x)
-        
-        
-        #print(Y_FCP_)
-        
-        #
-        
-        
-        
-        
+
         ######################################################################################################
         ######################################################################################################
-        import json
+
         File_name = Name_File+str(30)+'/FCP_Data.json'
         
         with open(File_name , 'r') as file:
             # Serialize and save your data to the file
             a = json.load(file)
             
-         
-        
-        
-        
         Y_FCP = []
         for item in a['FCP'][Method]:
             Y_FCP.append(a['FCP'][Method][item])
@@ -1170,13 +977,10 @@ class LAMP(object):
         
         
         for i in range(len(Y_FCP)):
-            #print(i,Y_FCP[i])
             next_x = Y_FCP[i][0]
-            #print(next_x,type(next_x))
             Y_FCP_[i].append( next_x)
         
-        
-        
+
         Y_B = [[],[],[],[]]
         
         
@@ -1191,16 +995,33 @@ class LAMP(object):
         
         PLT_f.scatter_line(True,0.4)
         
+        
+        
+        
+    def Table_2(self,Name_File,Iterations):
+        
+        Class_SC = CircularMixNet_SC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
+
+        Class_SC.E2E(0.200,Iterations,'LARMIX',Name_File,True)
+        
+        Class_MC = CircularMixNet_MC(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
+
+        Class_MC.E2E(0.200,Iterations,'LARMIX',Name_File,True)  
+        
+        
+        
+        
+        
+    def Table_3(self,Name_File,Iterations):
+        
+        Class_RM =  Regional_MixNet(self.num_targets,Iterations,self.Capacity,self.run,self.delay1,self.delay2,self.H_N,self.N,self.rate,self.num_gateways,self.Percentile,Name_File) 
+
+        Class_RM.E2E(0.200,Iterations,Name_File)
+        
+ 
 
         
-        
-        
-        
-        
-        
-        
-        
-        
+
         
         
         

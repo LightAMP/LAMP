@@ -2,13 +2,13 @@
 
 # -*- coding: utf-8 -*-
 """
-corrupted Mixes
+corrupted Mixes: To measure the FCP 
 """
 
 import numpy as np
 import itertools
-
-
+import math
+import random
 import numpy as np
 from sklearn_extra.cluster import KMedoids
 import random
@@ -70,7 +70,7 @@ def findindices(prob_dist, s):
 
 
 def nCr(n,r):
-    import math
+    
     f = math.factorial
     return f(n) // f(r) // f(n-r)
 
@@ -125,7 +125,7 @@ class  FCP_Mix(object):
             
             
     def C_random(self,G_mean):
-        #print(G_mean)
+
         Dict = self.Data
         CNodes = {}
         item    = []
@@ -146,9 +146,7 @@ class  FCP_Mix(object):
             else:
                 j = i +1
                 CNodes['PM%d' %j] = False
-       # print('hi')
-        #print(item,Index_x,Index_y)    
- 
+
         Term1 = 0
         for item1 in item:
             for item2 in Index_x:
@@ -217,7 +215,7 @@ class  FCP_Mix(object):
     
     
     def Greedy_For_Fairness(self,G_mean):
-        import numpy as np
+
         #Initially we consider all the nodes as hones one
         CNodes = {}
         for i in range(self.N):
@@ -229,16 +227,12 @@ class  FCP_Mix(object):
         Dict = self.Data
 
         Indicator = False #Shows the load balanced network or atleast the first layer
-        #for element in G_mean:#if node selection from forst layer is not uniform then it's not 
-            #balanced
-          #  if not element==1/self.W:
-           #     Indicator = True
-            #    break
+
         if  Indicator :
             W_List = findindices(G_mean,int(self.CNodes/3)) 
         
         else:
-            import random
+            
             WL = []
             LIs = [j+1 for j in range(self.W)]
        
@@ -431,72 +425,3 @@ class  FCP_Mix(object):
 
         return CNodes,Max
     
-    
-    '''    
-#Test of Function       
-import numpy as np
-
-W = 20
-data = {}
-for i in range(2*W):
-    a = np.random.rand(1, W)
-    b = [item / sum(a[0]) for item in a[0]]
-    data['PM'+str(i+1)] = b
-    
-    
-
-a = np.random.rand(1, W)
-b = [item / sum(a[0]) for item in a[0]]
-
-G_mean = b    
-G_Mean = [1/W for i in range(W)]
-        
-        
-print(G_mean)
-        
-C = FCP_Mix(data,30)
- 
-D,E = C.Greedy_For_Fairness(G_mean)
-print(D,E)
-
-
-
-D,E = C.C_random(G_mean)
-
-
-
-
-
-print(E,D)
-import json
-
-with open('D:/Approach3/ripe_November_12_2023_cleaned.json') as file:
-    Data0 = json.load(file)
-
-xx = [Data0[0:15],Data0[15:45],Data0[45:60]]
-D,E = C.Close_knit_nodes(G_mean, Data0[0:60])
-
-i = 0
-for item in D:
-    if D[item]:
-        i = i+1
-print(i)
-
-D,E = C.Close_knit_nodes(G_mean, xx)
-
-i = 0
-for item in D:
-    if D[item]:
-        i = i+1
-print(i)
-
-print(E,D)
-
-'''
-
-
-'''  
-a,b = find_closest_points(Data0,10)
-
-print(b)
-'''

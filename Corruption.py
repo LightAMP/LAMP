@@ -1,16 +1,21 @@
 
 # -*- coding: utf-8 -*-
 """
-corrupted Mixes
+corrupted Mixnodes:An adversary can corrupt mix nodes in the mixnet to increase its chances of de-anonymizing client connections. 
+This file provides the implementation, simulation, and evaluation of different strategies that adversaries can employ to exploit
+ the mixnet.
 """
-
+import random
+import timeit  
+import numpy as np
 import numpy as np
 import itertools
+import math
 def findsubsets(s, n):
     return list(itertools.combinations(s, n))
 
 def nCr(n,r):
-    import math
+    
     f = math.factorial
     return f(n) // f(r) // f(n-r)
 
@@ -186,8 +191,7 @@ class  corruptedMix(object):
         
 
     def Distance_of_two_points(self,point1,point2):
-        import math
-    
+
         P1 = point1.tolist()[0]
         P2 = point2.tolist()[0] 
     
@@ -198,7 +202,7 @@ class  corruptedMix(object):
         return Distance
 
     def n_closest_mix_nodes(self):
-        import numpy as np
+        
         N, b = np.shape(self.data)
         D = np.zeros((N,N))
     
@@ -257,7 +261,7 @@ class  corruptedMix(object):
         for X in range(1,int(self.N/3)+1):
             SET.append(X)
         W_List = findsubsets(set(SET),int(self.CNodes/3))
-        import numpy as np
+
         CNodes = {}
         for i in range(self.N):
             j = i +1
@@ -265,13 +269,13 @@ class  corruptedMix(object):
         C_i = int(self.CNodes/3)
 
         if nCr(self.W,C_i) < 60*self.N+1:
-            import timeit        
+                  
             Num_mix_nodes = []
             for i in range(1,self.W+1):
                 Num_mix_nodes.append(i)                
             WL = findsubsets(set(Num_mix_nodes), C_i)            
         else:
-            import random
+            
             WL = []
             LIs = []
             for j in range(self.W):
@@ -496,7 +500,7 @@ class  corruptedMix(object):
         return C,M
     
     def Worst_Case_0(self,Dict):
-        import numpy as np
+
         LAYERS =[1,2,3]
         x = [[],[],[]]
 

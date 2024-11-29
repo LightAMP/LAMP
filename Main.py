@@ -1,5 +1,5 @@
 """
-Main File: In this file we evaluate LAMP
+This file facilitates running all the experiments presented in LAMP
 """
             
 
@@ -51,9 +51,43 @@ from Main_functions import Main_functions
 #Input = 9
 
 
+
+#.............................Table 2.................................................................................
+
+#Input = 22
+
+
+
+#.............................Table 3.................................................................................
+
+#Input = 33
+
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Input = input('Please enter the Input parameter: ')
-Main_C = Main_functions(Input)
+Main_C = Main_functions(int(Input))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

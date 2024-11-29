@@ -1,56 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-A toy example
+Regional Mixnet: The Regional Mixnet approach aims to reduce high-latency links in mixnets by dividing the network into
+ distinct geographical regions. This approach segments the world into regions, ensuring that communication occurs primarily
+ within low-latency regional boundaries. This file provides the implementation, simulation, and evaluation of the Regional 
+ Mixnet approach.
 """
-'''
-Data1 = []
-
-import json
-
-with open('D:/Approach3/117_nodes_latency_December_2023_cleaned_up_9_no_intersection_1.json') as json_file: 
-
-    data0 = json.load(json_file) # Your list of dictionaries
-    
-print(data0[101])
-
-for i in range(40):
-    
-    if i <20:
-        data = {}
-        data['latitude'] = 37.979450 - 0.1*i
-        data['longitude'] = 23.716221 + 0.1*i
-        data['i_key'] = str(i+1)
-        data['latency_measurements'] = {}
-        for j in range(20):
-            data['latency_measurements'][str(j+1)] = 5+0.1*j
-            
-            
-        for k in range(20,40):
-            data['latency_measurements'][str(k+1)] = 50+0.1*j
-            
-    elif i >=20:
-        data = {}
-        data['latitude'] = 22.285521 - 0.1*i
-        data['longitude'] = 114.157692 + 0.1*i
-        data['i_key'] = str(i+1)
-        data['latency_measurements'] = {}
-        for j in range(20):
-            data['latency_measurements'][str(j+1)] = 50+0.1*j
-            
-            
-        for k in range(20,40):
-            data['latency_measurements'][str(k+1)] = 20+0.1*j
-    Data1.append(data)            
-    
-    
-
-# Write JSON data to the file
-with open('D:/Approach3/Made_up_data.json', 'w') as file:
-    json.dump(Data1, file, indent=2)
-'''
+from mpl_toolkits.basemap import Basemap
+from Plot import PLOT      
 from math import exp
 from scipy import constants
-
+import time
+import statistics
+# Import library for making the simulation, making random choices,
+#creating exponential delays, and defining matrixes.
+from scipy.stats import expon
+import simpy
+import random
+#from Datasets_ import Dataset
+import numpy  as np
+import pickle
+import json
+from Message_ import message
+import math
+from GateWay import GateWay
+from Mix_Node_ import Mix
+from FCP_ import FCP_Mix
+from NYM import MixNet
+from itertools import combinations
+from math import radians, sin, cos, sqrt, atan2
+from math import exp
+from scipy import constants
+import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap 
 # Import library for making the simulation, making random choices,
 #creating exponential delays, and defining matrixes.
 from scipy.stats import expon
@@ -58,7 +39,7 @@ import simpy
 import random
 import numpy  as np
 import pickle
-
+#from Datasets_ import Dataset
 from Message_ import message
 
 from GateWay import GateWay
@@ -73,14 +54,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-
+import pandas as pd
 
 
 
     
     
 def convert_coordinates(latitudes, longitudes):
-    import pandas as pd
+    
 
 
 
@@ -105,7 +86,7 @@ def Medd(List):
     N = len(List)
 
     List_ = []
-    import statistics
+   
     for i in range(N):
 
         List_.append( statistics.median(List[i]))
@@ -133,11 +114,11 @@ def Ent(List):
     return ent
 
 def Med(List,Per):
-    import numpy as np
+
     N = len(List)
 
     List_ = []
-    import statistics
+
     for i in range(N):
 
         List_.append( np.percentile(List[i], Per))
@@ -171,8 +152,7 @@ class Regional_MixNet(object):
         self.GlobalData = {}
         self.colors = ['royalblue','red','green','fuchsia','cyan','indigo','teal','lime','blue','black','orange','violet','lightblue']
         self.Adversary_Budget = 30          
-        #self.Data_Clustering = self.Clustering(4)
-        #self.Data_Clustering_ = self.classify_and_plot()
+
         self.Data_Clustering__ = self.Interpolated_NYM()  
 
         self.regions = ['1','2']
@@ -215,9 +195,7 @@ class Regional_MixNet(object):
         
     def Latency_Matrix(self,data=False):
         
-        
-        
-        import json
+
         
         with open('D:/Approach3/117_nodes_latency_December_2023_cleaned_up_9_no_intersection_1.json') as json_file: 
         
@@ -240,7 +218,7 @@ class Regional_MixNet(object):
 
         latency_matrix = self.Latency_Matrix()
         
-        import json
+      
         
         with open('D:/Approach3/117_nodes_latency_December_2023_cleaned_up_9_no_intersection_1.json') as json_file: 
         
@@ -263,7 +241,7 @@ class Regional_MixNet(object):
         
         # Plot the silhouette scores for different values of k
 
-        from Plot import PLOT      
+     
 
         X_L = 'Number of Clusters (k)'
         Y_t = 'Entropy/Latency'
@@ -321,31 +299,13 @@ class Regional_MixNet(object):
             Data_['Region'+str(i+1)] = [B_,A_]
             Data['Region'+str(i+1)] = data20
 
-        fig = px.scatter_geo(convert_coordinates(Data_['Region1'][1],Data_['Region1'][0]), lat='lat', lon='lon', color_discrete_sequence=[self.colors[0]],title='Mix nodes considered for the mix net')   
-        for i in range(1,optimal_k):
-            fig.add_trace(px.scatter_geo(convert_coordinates(Data_['Region'+str(i+1)][1],Data_['Region'+str(i+1)][0]), lat='lat', lon='lon', color_discrete_sequence=[self.colors[i]]).data[0])
 
-        # add the labels to the legend
-        fig.update_layout(legend=dict(title='Datasets'))
-        fig.show() 
-        import os        
-        #if not os.path.exists("images"):
-            #os.mkdir("images")        
-        #fig.write_image('images/datasets_Internet_Boundaries_NYM_newdataset_DEC2023_with_number_of_clusters_'+ str(K_cluster)+'.pdf')           
-        '''
-        DATA_LIST = {}
-        DATA_LIST['Region1'] = Data['Region5']
-        
-        DATA_LIST['Region2'] = Data['Region2'] 
-         
-        return DATA_LIST
-        '''
+
+
         return Data
     def Interpolated_NYM(self):
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.basemap import Basemap        
-        import json
-        
+       
+
         with open('Interpolated_NYM_250_DEC_2023.json') as File:
             data_list = json.load(File)
             
@@ -413,10 +373,9 @@ class Regional_MixNet(object):
             
             
     def classify_and_plot(self):
-        import json
+
         
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.basemap import Basemap
+        
         with open('D:/Approach3/Made_up_data.json') as json_file: 
         
             data_list = json.load(json_file) # Your list of dictionaries
@@ -446,33 +405,8 @@ class Regional_MixNet(object):
             elif -42 <= latitude <= -10 and 112 <= longitude <= 153:  # Australia
                 australia.append(node)
     
-        # Plotting on a globe map
-        plt.figure(figsize=(12, 8))
-        m = Basemap(projection='mill', llcrnrlat=-60, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, resolution='c')
-        m.drawcoastlines()
-    
-        def plot_nodes(nodes, label, color):
-            lats = [node.get('latitude', 0) for node in nodes]
-            lons = [node.get('longitude', 0) for node in nodes]
-            x, y = m(lons, lats)
-            m.scatter(x, y, label=label, color=color)
-    
-        plot_nodes(europe, 'Europe', 'blue')
-        plot_nodes(asia, 'Asia', 'green')
-        plot_nodes(north_america, 'North America', 'red')
-        plot_nodes(south_america, 'South America', 'purple')
-        plot_nodes(africa, 'Africa', 'orange')
-        plot_nodes(australia, 'Australia', 'cyan')
-    
-        # Add legend
-        #plt.legend()
-    
-        # Save the image
-    
-        #plt.savefig('D:/Approach3/images/Made_up_data.png',format='png', dpi=600)
-    
-        # Show the plot
-        #plt.show()
+
+
         Data_ = {}
         Data_['Region1'] = europe
         Data_['Region2'] = asia
@@ -507,7 +441,7 @@ class Regional_MixNet(object):
 
 
     def make_data(self):
-        from Datasets_ import Dataset
+       
         DF  = Dataset(self.data_type,self.N,self.Goal,self.CN,self.G)        
         DF.RIPE()        
         Data_set, Client_Data , GW_Data = DF.PLOT_New_dataset()
@@ -520,9 +454,7 @@ class Regional_MixNet(object):
     def data_interface(self):
         a = [(20,80),(-10,33) , (0,100),(33,100), (25,50),(-100,-50), (-40,25),(-100,-50)]
         b = ['Europe','Asia','North America','South America','Global']
-        
-        
-        import json
+   
         
         with open('cleaned_up_ripe_data_removed_negative_vals_2.json') as json_file: 
         
@@ -627,11 +559,8 @@ class Regional_MixNet(object):
         return delay_distance/2000
 
     def MixNet_Creation(self,name,W):
-        #print(W)
-        import numpy as np
-        import json
-        #data0 = self.Data_Clustering['Region'+name]
-        #data0 = self.Data_Clustering_['Region'+name]
+  
+
         data0 = self.Data_Clustering__['Region'+name]# Data of each regions created based on goegraphical partitions
 
         
@@ -650,7 +579,6 @@ class Regional_MixNet(object):
 
    
 
-        #BBC = [ data0[item]  for item in List if List.index(item) <(W)]
 
         
         self.close_data['Region'+name] =   B               
@@ -698,9 +626,8 @@ class Regional_MixNet(object):
         
         name = 'Global'
         self.W = W
-        import numpy as np
-        import json
-        #data0 = self.Data_Clustering_
+        
+
         data0 = self.Data_Clustering__
             
         
@@ -758,8 +685,7 @@ class Regional_MixNet(object):
         Names = ['1','2'] +['Global']
         Tau = self.Var
         Tau[0] = 0.01
-        import numpy as np
-        import time
+
         DATA = {}     
         xxxx1 = 0
         xxxx2 = 0
@@ -855,8 +781,7 @@ class Regional_MixNet(object):
         t = Tau
         A, mapping = self.sort_and_get_mapping(LIST_)
         T = 1-t
-    
-        import math
+
         B=[]
         D=[]
     
@@ -951,7 +876,7 @@ class Regional_MixNet(object):
     
 
     def Simulator(self,corrupted_Mix,Mix_Dict,W,GG): 
-        import simpy
+   
         Mixes = [] #All mix nodes
         GateWays = {}
         env = simpy.Environment()    #simpy environment
@@ -1020,14 +945,14 @@ class Regional_MixNet(object):
         return LIST
   
     def PreProcessing(self,W):
-        import time
+
         Data_R = {}
         regions = ['1','2']
         Names =  regions + ['Global']
         for region in regions:
             Data_R[region] = {}
         
-        import math
+
         Names_Data = {} 
         for name in Names:
             
@@ -1126,7 +1051,7 @@ class Regional_MixNet(object):
         return Entropy
     
     def make_T(self,G2,G3):
-        import numpy as np
+
         #g1 = np.matrix(G1)
         g2 = np.matrix(G2)
         g3 = np.matrix(G3)
@@ -1135,7 +1060,7 @@ class Regional_MixNet(object):
     def Analytic_Entropy(self,Data,name,W,Yes = False):
         self.W = W
         threshold = 1/self.W
-        import numpy as np
+
         Tau = self.Var
         Tau[0] =0.01
         Entropy_ = []
@@ -1202,14 +1127,14 @@ class Regional_MixNet(object):
                 
     
     def Latency_Med(self,List):
-        import numpy as np
+
         a = np.transpose(np.matrix(List))
         return Med(a.tolist())
     
 
     
     def percentile_from_probabilities(self,Factors, Delays, percentile):
-        import numpy as np
+
         T = np.array(np.transpose(np.matrix([Factors,Delays])).tolist())
         TT = T[T[:,1].argsort()]
         probabilities = TT[:,0].tolist()
@@ -1312,7 +1237,7 @@ class Regional_MixNet(object):
 
 
     def GW_Policy(self,Data,M):
-        import numpy as np
+
         data = {}
         
         Name = ['Europe','Asia','North America']
@@ -1337,7 +1262,6 @@ class Regional_MixNet(object):
         
         Tau = self.Var
         Tau[0] = 0.01
-        import numpy as np
 
         U__ = []
 
@@ -1393,7 +1317,6 @@ class Regional_MixNet(object):
         
         Tau = self.Var
         Tau[0] = 0.01
-        import numpy as np
 
         U__ = []
 
@@ -1434,13 +1357,10 @@ class Regional_MixNet(object):
 
 
 
-    def Trade_Off(self,e2e,Iteration,Name_):
-        
-        
-        import numpy as np
-        import json
+    def E2E(self,e2e,Iteration,Name_):
+
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','1','2']
@@ -1448,7 +1368,7 @@ class Regional_MixNet(object):
         WW = {'Global':52,'1':39,'2':13}
         
         Dictionaries = self.Circles_Creation(Iteration,WW)
-        import numpy as np
+
         IT = 'Iteration'
         Latency1 = []
         Latency2 = []
@@ -1469,10 +1389,10 @@ class Regional_MixNet(object):
             
             Entropy1.append(self.Analytic_Entropy(MyData,names,WW[names]))
             
-        df['A_Entropy_Global'] = Entropy1[0]
+        df['Analytical_Entropy_Global'] = Entropy1[0]
 
-        df['A_Entropy_'+(Names[1])] = Entropy1[1]     
-        df['A_Entropy_'+(Names[2])] = Entropy1[2]
+        df['Analytical_Entropy_'+(Names[1])] = Entropy1[1]     
+        df['Analytical_Entropy_'+(Names[2])] = Entropy1[2]
         
         Mix_delays = {}
         for name in Names:
@@ -1486,13 +1406,13 @@ class Regional_MixNet(object):
             for ii in range(len(Y[item])):
                 Mix_delays['Global'+item].append((e2e-Y[item][ii])/3)
             df['Link_delays'+'Global'+item] = Y[item]
-            df['Mix_delays'+ 'Global'+item] = Mix_delays['Global'+item]
+            df['Mixing_delays'+ 'Global'+item] = Mix_delays['Global'+item]
         
         for jj in range(len(Latency1)):
             for ii in range(len(Latency1[0])):
                 Mix_delays[str(jj+1)].append((e2e-Latency1[jj][ii])/3)
             df['Link_delays'+str(jj+1)] = Latency1[jj]
-            df['Mix_delays'+str(jj+1)]  = Mix_delays[str(jj+1)]
+            df['Mixing_delays'+str(jj+1)]  = Mix_delays[str(jj+1)]
             
             
         #print(df)
@@ -1576,7 +1496,7 @@ class Regional_MixNet(object):
             
         Sim_Latency = {}
         Sim_Entropy = {}
-        import numpy as np
+
         for item in Names:
             if item == 'Global':
                 Sim_Latency['Global'+'1'] = []
@@ -1589,8 +1509,8 @@ class Regional_MixNet(object):
         for ii in range(len(self.Var)):
             Sim_Latency['Global'+str(1)].append(np.mean(Latency_alpha_Global1[ii]))
             Sim_Entropy['Global'+str(1)].append(np.mean(Entropy_alpha_Global1[ii]))
-        df['Sim_Latency'+'Global'+str(1)] = Sim_Latency['Global'+str(1)]
-        df['Sim_Entropy'+'Global'+str(1)] = Sim_Entropy['Global'+str(1)]
+        df['Simulated_Latency'+'Global'+str(1)] = Sim_Latency['Global'+str(1)]
+        df['Simulated_Entropy'+'Global'+str(1)] = Sim_Entropy['Global'+str(1)]
         
             
                 
@@ -1673,8 +1593,8 @@ class Regional_MixNet(object):
         for ii in range(len(self.Var)):
             Sim_Latency[str(1)].append(np.mean(Latency_alpha_1[ii]))
             Sim_Entropy[str(1)].append(np.mean(Entropy_alpha_1[ii]))
-        df['Sim_Latency'+str(1)] = Sim_Latency[str(1)]
-        df['Sim_Entropy'+str(1)] = Sim_Entropy[str(1)]        
+        df['Simmulatted_Latency'+str(1)] = Sim_Latency[str(1)]
+        df['Simmulatted_Entropy'+str(1)] = Sim_Entropy[str(1)]        
         #print(Sim_Latency,Sim_Entropy)
 
 #################################################################################################        
@@ -1758,8 +1678,8 @@ class Regional_MixNet(object):
         for ii in range(len(self.Var)):
             Sim_Latency['Global'+str(2)].append(np.mean(Latency_alpha_Global2[ii]))
             Sim_Entropy['Global'+str(2)].append(np.mean(Entropy_alpha_Global2[ii]))
-        df['Sim_Latency'+'Global'+str(2)] = Sim_Latency['Global'+str(2)]
-        df['Sim_Entropy'+'Global'+str(2)] = Sim_Entropy['Global'+str(2)]
+        df['Simulated_Latency'+'Global'+str(2)] = Sim_Latency['Global'+str(2)]
+        df['Simulated_Entropy'+'Global'+str(2)] = Sim_Entropy['Global'+str(2)]
 
 
 
@@ -1836,13 +1756,13 @@ class Regional_MixNet(object):
         for ii in range(len(self.Var)):
             Sim_Latency[str(2)].append(np.mean(Latency_alpha_2[ii]))
             Sim_Entropy[str(2)].append(np.mean(Entropy_alpha_2[ii]))
-        df['Sim_Latency'+str(2)] = Sim_Latency[str(2)]
-        df['Sim_Entropy'+str(2)] = Sim_Entropy[str(2)]
+        df['Simulated_Latency'+str(2)] = Sim_Latency[str(2)]
+        df['Simulated_Entropy'+str(2)] = Sim_Entropy[str(2)]
         
-        
-        #print(df)
-        import json
-        with open(File_name+'/Trade_Off_Data.json','w') as file:
+        df['Tau'] = [0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+
+
+        with open('Results'+'/E2E_Limit_RM.json','w') as file:
             json.dump(df,file)
 
 
@@ -1851,7 +1771,7 @@ class Regional_MixNet(object):
 
     def filter_matrix_entries(self,matrix, threshold):
         
-        import numpy as np
+
         # Convert the matrix to numpy array for easier manipulation
         matrix = np.array(matrix)
         
@@ -1869,7 +1789,7 @@ class Regional_MixNet(object):
 
         
     def FCP_Greedy(self,data,G_mean,Type):
-        from FCP_ import FCP_Mix
+
         C = FCP_Mix(data,self.Adversary_Budget)
         if Type=='Random':
             C_nodes,FCP = C.C_random(G_mean)
@@ -1880,12 +1800,9 @@ class Regional_MixNet(object):
         return [C_nodes, FCP]
     
     def FCP(self,Iteration,Name_):
-        
-        
-        import numpy as np
-        import json
+        import os
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','1','2']
@@ -1893,7 +1810,7 @@ class Regional_MixNet(object):
         WW = {'Global':52,'1':39,'2':13}
         
         Dictionaries = self.Circles_Creation(Iteration,WW)
-        import numpy as np
+
         IT = 'Iteration'
 
         Var = self.Var
@@ -1996,10 +1913,9 @@ class Regional_MixNet(object):
                     A_mean = np.mean(A,axis=0)
                     AVE_FCP[Methods[counter]][str(term)+item] = A_mean
                     
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names_ = ['Global1','Global2','1','2'] 
@@ -2011,13 +1927,7 @@ class Regional_MixNet(object):
                 Y[m_name][name] = []
                 for term in self.Var:
                     Y[m_name][name].append(AVE_FCP[m_name][str(term)+name])
-                    
-                    
-                    
-        
-
-
-        from Plot import PLOT      
+    
 
         X_L = r'$\tau $'
         Y_t = 'Throughput'
@@ -2054,9 +1964,7 @@ class Regional_MixNet(object):
                 
         self.Simulation_FCP = output__
         FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
-        #return AVE_FCP
-        
-        import json
+
         with open(File_name+'/FCP_Data.json','w') as file:
             json.dump(FCP_Dicts,file)
 
@@ -2269,7 +2177,7 @@ class Regional_MixNet(object):
             'Latency_LARMIX' : Latency_alpha_LARMIX,
             'Entropy_LARMIX' : Entropy_alpha_LARMIX
                               }
-        import json
+
 
         dics = json.dumps(df)
         with open(File_name + '/'+ 'FCP' +'Sim.json','w') as df_sim:
@@ -2410,65 +2318,6 @@ class Regional_MixNet(object):
             Entropy_alpha_Fair.append(Message_Entropy_Vector)
 
 
-
-###########################################To be added ##############################   
-            '''
-        for j in Var:
-            alpha = j       
-            End_to_End_Latancy_Vector = []
-            End_to_End_Latancy_Vector_T = []
-            Message_Entropy_Vector = []            
-            #print(output__['Iteration'+str(1)]['CN'][0])
-            for i in range(len(Dictionaries)):
-                            
-
-                Mix_Dict = {}
-                if x_name[0] == 'G':
-                    
-                    self.G = int(xx_value*len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(1)][0]))
-                else:
-                    self.G = len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(1)][0])
-                    
-                
-                #print(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)])
-                for I in range(self.G):
-
-                    if x_name[0] == 'G':
-                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['G'+str(I+1)]
-                        
-                    else: 
-                        Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['G'+str(I+1)]
-    
-
-
-                if x_name[0] == 'G':
-
-                    self.W = int(len(Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(1)][0]))
-                else:
-                    self.W = int(len(Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(1)][0]))                  
-                for Counter__ in range(3*self.W):
-                    corrupted_Mix['PM'+str(Counter__)] = False                    
-                
-                for J in range(2*self.W):
-
-                    if x_name[0] == 'G':
-                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['Global'][x_name[-1]]['tau'+str(alpha)]['PM'+str(J+1)]
-    
-                    else:
-                        Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)][x_name]['tau'+str(alpha)]['PM'+str(J+1)]
-                #print(self.G,self.W,'Hi')
-                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict,self.W,self.G)
-                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
-                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
-                Message_Entropy_Vector = Message_Entropy_Vector + ENT  
-                    
-            Latency_alpha_LARMIX.append(End_to_End_Latancy_Vector)
-            Latency_alpha_LARMIX_T.append(End_to_End_Latancy_Vector_T)
-            Entropy_alpha_LARMIX.append(Message_Entropy_Vector)
-        '''
-            
-##################################################################################
-##################################################################################
             
 
         labels = [0.0,0.2,0.4,0.6,0.8,1]
@@ -2483,7 +2332,7 @@ class Regional_MixNet(object):
             'Latency_LARMIX' : Latency_alpha_LARMIX,
             'Entropy_LARMIX' : Entropy_alpha_LARMIX
                               }
-        import json
+
 
         dics = json.dumps(df)
         with open(File_name + '/'+ 'FCP' +'Sim_simple.json','w') as df_sim:
@@ -2503,10 +2352,9 @@ class Regional_MixNet(object):
     def FCP_Budget(self,Iteration,Name_,Budget):
         
         self.Adversary_Budget = Budget
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','1','2']
@@ -2514,7 +2362,7 @@ class Regional_MixNet(object):
         WW = {'Global':52,'1':39,'2':13}
         
         Dictionaries = self.Circles_Creation(Iteration,WW)
-        import numpy as np
+
         IT = 'Iteration'
 
         Var = [0.6]
@@ -2617,10 +2465,9 @@ class Regional_MixNet(object):
                     A_mean = np.mean(A,axis=0)
                     AVE_FCP[Methods[counter]][str(term)+item] = A_mean
                     
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os 
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names_ = ['Global1','Global2','1','2'] 
@@ -2640,9 +2487,7 @@ class Regional_MixNet(object):
 
         self.Simulation_FCP = output__
         FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
-        #return AVE_FCP
-        
-        import json
+
         with open(File_name+'/FCP_Data.json','w') as file:
             json.dump(FCP_Dicts,file)
         
@@ -2652,10 +2497,9 @@ class Regional_MixNet(object):
         
         
     def EL_Analysis1(self,Name_,Iteration,K_Cluster):
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os   
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','1','2']
@@ -2665,10 +2509,10 @@ class Regional_MixNet(object):
         Entropy1 = []
         YourData = {}
         Latency1.append([0])
-        import time
+
         t1 = time.time()
         MyData = self.Circles_Creation(Iteration,WW)
-        #print(time.time()-t1)
+
         YourData = MyData
         
         for names in Names:
@@ -2705,12 +2549,12 @@ class Regional_MixNet(object):
                 
         Data_saving = {'Alpha':self.Var,
             'Latency':LatencY,'Entropy':Entropy1,'Frac':Frac}
-        import pickle   
+  
         file_name = Name_+'/data_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)      
 
-        from Plot import PLOT      
+
 
         X_L = r'$\tau$'
         Y_t = 'Entropy/Latency'
@@ -2749,7 +2593,7 @@ class Regional_MixNet(object):
         
         Data_saving = {'Alpha':Alpha,
             'Latency':LatencY,'Entropy':Entropy1,'Frac':Frac}
-        import pickle   
+        
         file_name = Name_+'/data_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)
@@ -2767,10 +2611,9 @@ class Regional_MixNet(object):
 
 
     def EL_Analysis1_RIPE(self,Name_,Iteration,K_Cluster):
-        import numpy as np
-        import json
+   
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','1','2']
@@ -2780,7 +2623,7 @@ class Regional_MixNet(object):
         Entropy1 = []
         YourData = {}
         Latency1.append([0])
-        import time
+
         t1 = time.time()
         MyData = self.Circles_Creation(Iteration,WW)
         #print(time.time()-t1)
@@ -2820,12 +2663,11 @@ class Regional_MixNet(object):
                 
         Data_saving = {'Alpha':self.Var,
             'Latency':LatencY,'Entropy':Entropy1,'Frac':Frac}
-        import pickle   
+  
         file_name = Name_+'/data_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)      
 
-        from Plot import PLOT      
 
         X_L = r'$\tau$'
         Y_t = 'Entropy/Latency'
@@ -2864,7 +2706,7 @@ class Regional_MixNet(object):
         
         Data_saving = {'Alpha':Alpha,
             'Latency':LatencY,'Entropy':Entropy1,'Frac':Frac}
-        import pickle   
+ 
         file_name = Name_+'/data_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)
@@ -2883,10 +2725,8 @@ class Regional_MixNet(object):
 
 
     def EL_Analysis(self,Name_,Iteration,K_Cluster):
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','Europe','Asia','North America','South America']
@@ -2937,12 +2777,11 @@ class Regional_MixNet(object):
                 
         Data_saving = {'Alpha':self.Var,
             'Latency':LatencY,'Entropy':Entropy1,'Frac':Frac}
-        import pickle   
+
         file_name = Name_+'/data_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)      
 
-        from Plot import PLOT      
 
         X_L = r'$\tau$'
         Y_t = 'Entropy/Latency'
@@ -2981,7 +2820,7 @@ class Regional_MixNet(object):
         
         Data_saving = {'Alpha':Alpha,
             'Latency':LatencY,'Entropy':Entropy1,'Frac':Frac}
-        import pickle   
+     
         file_name = Name_+'/data_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)
@@ -2995,7 +2834,7 @@ class Regional_MixNet(object):
         #117_nodes_latency_December_2023_cleaned_up_9_no_intersection_1
 
 
-        import json
+   
         
         with open('D:/Approach3/117_nodes_latency_December_2023_cleaned_up_9_no_intersection_1.json') as json_file: 
         
@@ -3021,10 +2860,9 @@ class Regional_MixNet(object):
         
         
     def Load_Analysis(self,Name_,Iteration,K_Cluster):
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names = ['Global','1','2']
@@ -3048,12 +2886,12 @@ class Regional_MixNet(object):
                 
         Data_saving = {'Alpha':self.Var,
             'Loads':Loads}
-        import pickle   
+ 
         file_name = Name_+'/Loads_Analytic.pkl'
         with open(file_name, 'wb') as file:
             pickle.dump(Data_saving, file)      
 
-        from Plot import PLOT      
+     
 
         X_L = r'$\tau$'
         Y_L = 'Over Loads Percentage'
@@ -3083,197 +2921,20 @@ class Regional_MixNet(object):
 
 
 
-'''          
- #Exicution###################################################################
-data = 'RIPE'
-W = 60
 
-N = 3*W
-num_gateways = W
-Goal = 'Circle'+str(W)
-delay1 = 0.04
-delay2 = 0.0001
-Capacity = 10000000000000000000000000000000000000000000000000000000000000000
-H_N = round(N/3)
-rate = 100
-num_targets = 200
-Iterations = 20
-run = 0.6
-Percentile = [50,95]
-Sim = CircularMixNet(num_targets,Iterations,Capacity,run,delay1,delay2,H_N,N,rate,num_gateways,Percentile,Goal) 
-'''
 
-#Sim.Trade_Off(0.2,2,'Trade_off_Test')
 
 
 
 
-#Sim.EL_Analysis1('Interpolated_data2',1,2)
 
 
 
-#Sim.FCP(2,'FCP_First_Test')
 
 
 
 
 
-
-
-
-
-
-
-
-
-#europe, asia, north_america, south_america, africa, australia = Sim.Interpolated_NYM()
-
-#NYM_Data = Sim.Clustering(6)
-
-#europe, asia, north_america, south_america, africa, australia = Sim.classify_and_plot()
-#print(europe, asia, north_america, south_america, africa, australia)
-#print(len(europe), len(asia), len(north_america), len(south_america), len(africa), len(australia))
-#print(len(A['Region2']))
-
-
-#print(len(A['Region4']))
-#Sim.data_interface()
-#print(Sim.Limit_N)
-#WW = {'Global':100,'Asia':20,'North America':8,'South America':6,'Europe':70}
-
-#Sim.PreProcessing(WW)
-##Sim.Limit_N
-
-#Sim.Global_Behavior(100)
-#Sim.Circles_Creation(2,WW)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-
-Data_ = Sim.Data_Generation
-
-import plotly.express as px
-
-a = Data_['Location'+'Europe']
-
-b = Data_['Location'+'North America']
-
-bb = Data_['Location'+'South America']
-c = Data_['Location'+'Asia']
-
-
-# assume you have three data sets stored in variables `df1`, `df2`, and `df3`
-# and each data set has columns `lat` and `lon`
-
-fig = px.scatter_geo(convert_coordinates(a[1],a[0]), lat='lat', lon='lon', color_discrete_sequence=['blue'],title='Mix nodes considered for the mix net')
-fig.add_trace(px.scatter_geo(convert_coordinates(b[1],b[0]), lat='lat', lon='lon', color_discrete_sequence=['green']).data[0])
-fig.add_trace(px.scatter_geo(convert_coordinates(bb[1],bb[0]), lat='lat', lon='lon', color_discrete_sequence=['black']).data[0])
-fig.add_trace(px.scatter_geo(convert_coordinates(c[1],c[0]), lat='lat', lon='lon', color_discrete_sequence=['red']).data[0])
-# add the labels to the legend
-fig.update_layout(legend=dict(title='Datasets'))
-fig.show() 
-
-
-
-import os
-
-if not os.path.exists("images"):
-    os.mkdir("images")
-
-fig.write_image('images/datasets2.pdf')
-'''
-#g,m = Sim.MixNet_Creation('Asia',10)
-
-
-#a = Sim.PreProcessing('Asia',10)
-
-
-
-
-#Sim.EL_Analysis('Tes0', 1,2)
-
-#Sim.PreProcessing('Cluster0',2)
-
-
-#Sim.Analytic_Latency_Slow_Fast('Test2')
-
-
-
-#GateWays,Layers = Sim.MixNet_Creation()
-#GateWays,Layers = Sim.Distance_MG(MixNet1,GateWays1)
-'''
-import numpy as np
-import json
-Name_ = 'test00'
-File_name = Name_        
-import os         
-if not os.path.exists(File_name):
-    os.mkdir(os.path.join('', File_name))     
-import pickle
-Sim.PreProcessing(1,Name_)
-
-with open(File_name+'\data.pkl', 'rb') as file:
-    Dictionaries = pickle.load(file)
-
-Latency_A1,Latency_A2 = Sim.Analytic_Latency(Dictionaries)
-'''
-#data = Sim.PreProcessing(1,'Test0')
-#print(Sim.Analytic_Latency(data))
-#
-#print(Sim.Analytic_Entropy(data))
-#Sim.Analytic_Latency(data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
 
 
 

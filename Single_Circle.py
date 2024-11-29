@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Circle
+Single Circle:
+    
+One of the approaches in LAMP for selecting mix-nodes is the Single Circle method. 
+In this approach, a client identifies a circle with a radius r around itself, selecting mix-nodes within this
+circle while excluding nodes outside the circle. This file includes the functions 
+required to simulate, evaluate, and analyze this approach.
 """
-
+from Plot import PLOT      
 from math import exp
 from scipy import constants
-
+import time
+import statistics
 # Import library for making the simulation, making random choices,
 #creating exponential delays, and defining matrixes.
 from scipy.stats import expon
@@ -13,18 +19,18 @@ import simpy
 import random
 import numpy  as np
 import pickle
-
+import json
 from Message_ import message
-
+import math
 from GateWay import GateWay
 from Mix_Node_ import Mix
-
+from FCP_ import FCP_Mix
 from NYM import MixNet
 
 from Message_Genartion_and_mix_net_processing_ import Message_Genartion_and_mix_net_processing
 
 def I_key_finder(x,y,z,G,NYM = True):
-    import json
+    
     
     if NYM:
 
@@ -61,11 +67,10 @@ def Ent(List):
     return ent
 
 def Med(List,Per):
-    import numpy as np
     N = len(List)
 
     List_ = []
-    import statistics
+
     for i in range(N):
 
         List_.append( np.percentile(List[i], Per))
@@ -183,8 +188,6 @@ class CircularMixNet_SC(object):
     def MixNet_Creation(self):  
         GateWays = {}
         Layer = {'Layer1':{},'Layer2':{}}
-        import json
-        import numpy as np
     
         with open('ripe_November_12_2023_cleaned.json') as json_file: 
         
@@ -235,7 +238,6 @@ class CircularMixNet_SC(object):
 
     
     def MixNet_Creation_(self,Iteration):  
-        import json
         with open('LARMIX__2.json','r') as file:
             data0 = json.load(file)
         self.close_data = []    
@@ -243,7 +245,7 @@ class CircularMixNet_SC(object):
         GateWays_,Layer_,C_D = data0['Iteration'+str(Iteration+1)]
         Layer = {'Layer1':{},'Layer2':{}}
         n = int(len(C_D)*(1/3))
-        #print(n,self.W)
+
         for k in range(3):
             for i in range(n*k,(n)*(k+1)):
                 if k*n <= i < k*n+self.W:
@@ -255,10 +257,10 @@ class CircularMixNet_SC(object):
         for i in range(self.W):
             for k in range(3):
                 for j in range(n*k,n*k+self.W):
-                    #print(j)
+  
                     GateWays['G'+str(i+1) +'PM'+str(1+j-n*k+self.W*k)] = GateWays_['G'+str(i+1) +'PM'+str(1+j)]
                     
-        #print(Layer_['Layer1'])
+
         for k in range(2):
             for i in range(k*n,k*n+self.W):
                 for j in range((k+1)*n,(k+1)*n+self.W):
@@ -277,7 +279,6 @@ class CircularMixNet_SC(object):
     
     
     def Circles_Creation(self,Iterations,Common = False): 
-        import numpy as np
         Delta = self.Var
 
         DATA = {}
@@ -314,9 +315,6 @@ class CircularMixNet_SC(object):
     
     def Circles_Creation_(self,Iterations,Common = False): 
         self.ALPHA_var = [0.02,0.05,0.1,0.15,0.2,0.3]
-        import numpy as np
-        #Delta = self.Var
-
         DATA = {}
         Policies = {}
         for I in range(Iterations):
@@ -369,7 +367,6 @@ class CircularMixNet_SC(object):
         A, mapping = self.sort_and_get_mapping(LIST_)
         T = 1-t
     
-        import math
         B=[]
         D=[]
     
@@ -454,7 +451,8 @@ class CircularMixNet_SC(object):
     
 
     def Simulator(self,corrupted_Mix,Mix_Dict): 
-        import simpy
+        from Message_Genartion_and_mix_net_processing_ import Message_Genartion_and_mix_net_processing
+
         Mixes = [] #All mix nodes
         GateWays = {}
         env = simpy.Environment()    #simpy environment
@@ -506,8 +504,7 @@ class CircularMixNet_SC(object):
   
     
     def PreProcessing(self,Iteration,Common = False):
-        import numpy as np
-        import time
+
         DATA = self.Circles_Creation(Iteration,Common)
         data = {}
         
@@ -612,8 +609,6 @@ class CircularMixNet_SC(object):
     
     
     def PreProcessing_(self,Iteration,Common = False):
-        import numpy as np
-        import time
         DATA = self.Circles_Creation_(Iteration,Common)
         data = {}
         
@@ -762,8 +757,6 @@ class CircularMixNet_SC(object):
         return Entropy
     
     def make_T(self,G1,G2,G3):
-        import numpy as np
-
         g2 = np.matrix(G2)
         g3 = np.matrix(G3)
         return g2.dot(g3) 
@@ -817,7 +810,6 @@ class CircularMixNet_SC(object):
                     Gamma34.append(data['PM'+str(j+1)][str(alpha)+'LARMIX'+str(0.3)][1])                    
                     Gamma35.append(data['PM'+str(j+1)][str(alpha)+'LARMIX'+str(0.9)][1])
                 threshold = 1/self.W
-                import numpy as np
                 T_0 = self.make_T(Gamma21,Gamma21,Gamma31)
                 LIST_LOAD = self.filter_matrix_entries(Gamma11, threshold)+self.filter_matrix_entries(Gamma21, threshold)+self.filter_matrix_entries(Gamma31, threshold)
                 max_load = (np.sum(LIST_LOAD))/(len(LIST_LOAD))
@@ -872,7 +864,6 @@ class CircularMixNet_SC(object):
 
     def filter_matrix_entries(self,matrix, threshold):
         
-        import numpy as np
         # Convert the matrix to numpy array for easier manipulation
         matrix = np.array(matrix)
         
@@ -909,7 +900,6 @@ class CircularMixNet_SC(object):
                 for j in range(self.W,2*(self.W)):
                     Gamma31.append(data['PM'+str(j+1)][str(alpha)+Name][1])
 
-                import numpy as np
                 T_0 = self.make_T(Gamma11,Gamma21,Gamma31)
                 E_0 = self.Entropy_Transformation(T_0)
                 Entropy_[str(alpha)+Name].append(E_0)
@@ -929,14 +919,14 @@ class CircularMixNet_SC(object):
                 
     
     def Latency_Med(self,List):
-        import numpy as np
+
         a = np.transpose(np.matrix(List))
         return Med(a.tolist())
     
 
     
     def percentile_from_probabilities(self,Factors, Delays, percentile):
-        import numpy as np
+
         T = np.array(np.transpose(np.matrix([Factors,Delays])).tolist())
         TT = T[T[:,1].argsort()]
         probabilities = TT[:,0].tolist()
@@ -1059,7 +1049,6 @@ class CircularMixNet_SC(object):
                                 
                     
     def Analytic_Latency_normal(self,Data1,Routing):
-        import numpy as np
 
         U__ = []
 
@@ -1100,7 +1089,7 @@ class CircularMixNet_SC(object):
 
         
     def FCP_Greedy(self,data,G_mean,Type):
-        from FCP_ import FCP_Mix
+
         C = FCP_Mix(data,self.Adversary_Budget)
         if Type=='Random':
             C_nodes,FCP = C.C_random(G_mean)
@@ -1114,8 +1103,7 @@ class CircularMixNet_SC(object):
     
     
     def FCP(self,Iteration,Name_,Common = False):
-        #[0,5,10,50,100]
-        import numpy as np
+
         IT = 'Iteration'
         Dictionaries = self.PreProcessing(Iteration,Common)
         Var = self.Var
@@ -1180,10 +1168,9 @@ class CircularMixNet_SC(object):
                     A_mean = np.mean(A,axis=0)
                     AVE_FCP[Methods[counter]][str(term)+item] = A_mean
 
-        import numpy as np
-        import json
-        File_name = Name_        
-        import os         
+
+        File_name = Name_ 
+        import os              
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names_ = ['LARMIX0.3','LARMIX','LARMIX0.9','Fair','Uniform']
@@ -1196,12 +1183,6 @@ class CircularMixNet_SC(object):
                 for term in range(5):
                     Y[m_name][name].append(AVE_FCP[m_name][str(term)+name])
                     
-                    
-                    
-        
-
-
-        from Plot import PLOT      
 
         X_L = r'$\alpha = 0.02$'
         Y_t = 'Throughput'
@@ -1238,9 +1219,7 @@ class CircularMixNet_SC(object):
                 
         self.Simulation_FCP = output__
         FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
-        #return AVE_FCP
-        
-        import json
+
         with open(File_name+'/FCP_Data.json','w') as file:
             json.dump(FCP_Dicts,file)
 
@@ -1391,18 +1370,15 @@ class CircularMixNet_SC(object):
             'Latency_LARMIX' : Latency_alpha_LARMIX,
             'Entropy_LARMIX' : Entropy_alpha_LARMIX
                               }
-        import json
 
         dics = json.dumps(df)
         with open(File_name + '/'+ 'FCP' +'Sim.json','w') as df_sim:
             json.dump(dics,df_sim)   
-        #print('yes')
 
     def FCP_Budget(self,Iteration,Name_,Budget,Common = False):
-        #[0,5,10,50,100]
-        
+
         self.Adversary_Budget = Budget
-        import numpy as np
+
         IT = 'Iteration'
         Dictionaries = self.PreProcessing(Iteration,Common)
         Var = [0.03]
@@ -1457,9 +1433,7 @@ class CircularMixNet_SC(object):
                 for term in [3]:
                     A = []
                     for j in range(Iteration):
-                        
-                        #print(output__[IT+str(j)]['FCP'])
-                            
+
                         b = output__[IT+str(j)]['FCP'][counter][str(term)+item]
 
                         A.append(b)
@@ -1467,10 +1441,8 @@ class CircularMixNet_SC(object):
                     A_mean = np.mean(A,axis=0)
                     AVE_FCP[Methods[counter]][str(term)+item] = A_mean
 
-        import numpy as np
-        import json
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))  
         Names_ = ['LARMIX0.3','LARMIX','LARMIX0.9','Fair','Uniform']
@@ -1483,16 +1455,10 @@ class CircularMixNet_SC(object):
                 for term in [3]:
                     Y[m_name][name].append(AVE_FCP[m_name][str(term)+name])
                     
-                    
-                    
-        
-
 
 
         FCP_Dicts = {'FCP':Y,'FCP_Sim':output__}
-        #return AVE_FCP
-        
-        import json
+
         with open(File_name+'/FCP_Data.json','w') as file:
             json.dump(FCP_Dicts,file)
 
@@ -1501,10 +1467,9 @@ class CircularMixNet_SC(object):
 
 #################################################################################################
     def E2E(self,e2e,Iteration,Item,Name_,Common = False):
-        import numpy as np
-        import json
-        File_name = Name_        
-        import os         
+
+        File_name = Name_  
+        import os             
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))      
         Dictionaries = self.PreProcessing(Iteration,Common)
@@ -1557,22 +1522,21 @@ class CircularMixNet_SC(object):
             
         Sim_L_mean = []
         Sim_E_mean = []
-        import numpy as np
+
         for i in range(len(Mix_delays)):
             Sim_L_mean.append(np.mean(Latency_alpha_[i]))
             Sim_E_mean.append(np.mean(Entropy_alpha_[i]))
-        #print(Sim_E_mean,Sim_L_mean,Entropy_A,Latency_A1,Mix_delays)
-        
-        df = {'Sim_E_mean':Sim_E_mean,
-              'Sim_L_mean':Sim_L_mean,
-              'Entropy_A':Entropy_A,
-              'Latency_A1':Latency_A1,
-              'Mix_delays':Mix_delays}            
-        
-        import json
-        with open(File_name+'/Data_Tradeoffs'+Item+'.json','w') as file:
-            json.dump(df,file)
 
+        df = {'Radius' : [0.001,0.005,0.015,0.03,0.05],
+            'Simulated_Entropy_mean':Sim_E_mean,
+              'Simulated_Latency_mean':Sim_L_mean,
+              'Analytical_Entropy':Entropy_A,
+              'Analytical_Latency':Latency_A1,
+              'Mixing_delays':Mix_delays}
+        
+
+        with open('Results'+'/E2E_Limit_SC_'+Item+'.json','w') as file:
+            json.dump(df,file)
             
             
 
@@ -1580,7 +1544,7 @@ class CircularMixNet_SC(object):
 
     def Time_Analysis(self,Name_,Iteration,Common = False):
 
-        import time
+ 
 
         Dictionaries = self.PreProcessing(Iteration,Common)
         t2= self.Time_is_money
@@ -1623,17 +1587,15 @@ class CircularMixNet_SC(object):
 
 
     def EL_Analysis(self,Name_,Iteration,Common = False):
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))      
-        import time
+
         t1 = time.time()
         Dictionaries = self.PreProcessing(Iteration,Common)
-        #print(time.time()-t1)
-        
+
         Entropy_A = self.Analytic_Entropy(Dictionaries)
         Latency_A1,Latency_A2 = self.Analytic_Latency(Dictionaries)
         Frac = []
@@ -1642,7 +1604,7 @@ class CircularMixNet_SC(object):
             Entropy100 = np.matrix(Entropy_A[I])
             f1 = Entropy100/Latency100
             Frac.append(f1.tolist()[0])
-        from Plot import PLOT  
+
         Name_t = File_name + '/'+ 'Throughput.png'        
         Y_t = 'Entropy/Latency'
         X_L = r'$\alpha = 0.02$'
@@ -1667,7 +1629,8 @@ class CircularMixNet_SC(object):
         PLT_L1 = PLOT(Alpha,Latency_A2,DD,X_L,Y_L,Name_Latency_)
 
         PLT_L1.scatter_line(True,0.2)        
-        import pickle        
+
+       
         df = {'Alpha':Alpha,
             'Latency':Latency_A1,'Entropy':Entropy_A,'Frac':Frac                            
                               
@@ -1675,173 +1638,22 @@ class CircularMixNet_SC(object):
         with open(File_name + '/'+'Analytical.pkl', 'wb') as file:
             # Serialize and save your data to the file
             pickle.dump(df, file) 
-        '''
-#################################################################################         
-        Latency_alpha_Uniform = []
-        Latency_alpha_Uniform_T = []    
-        Entropy_alpha_Uniform = []
-        Latency_alpha_Fair = []
-        Latency_alpha_Fair_T = []    
-        Entropy_alpha_Fair = []
-        Latency_alpha_LARMIX = []
-        Latency_alpha_LARMIX_T = []    
-        Entropy_alpha_LARMIX = []
-        corrupted_Mix = {}
-
-        for k in range(self.N):
-            corrupted_Mix['PM'+str(k+1)] = False
-
-
-###########################################Uniform ##############################   
-        for j in range(5):
-            alpha = j       
-            End_to_End_Latancy_Vector = []
-            End_to_End_Latancy_Vector_T = []
-            Message_Entropy_Vector = []            
-
-            for i in range(len(Dictionaries)):
-                            
-
-                Mix_Dict = {}
-                for I in range(self.G):
-                    Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['G'+str(I+1)][str(alpha)+'Uniform']
-                for J in range(2*self.W):
-                    Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['PM'+str(J+1)][str(alpha)+'Uniform']
-
-
-
-                    
-                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict)
-                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
-                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
-                Message_Entropy_Vector = Message_Entropy_Vector + ENT  
-                    
-            Latency_alpha_Uniform.append(End_to_End_Latancy_Vector)
-            Latency_alpha_Uniform_T.append(End_to_End_Latancy_Vector_T)
-            Entropy_alpha_Uniform.append(Message_Entropy_Vector)
-
-
-            
-###########################################Fair ##############################   
-        for j in range(5):
-            alpha = j      
-            End_to_End_Latancy_Vector = []
-            End_to_End_Latancy_Vector_T = []
-            Message_Entropy_Vector = []            
-
-            for i in range(len(Dictionaries)):
-                            
-
-                Mix_Dict = {}
-                for I in range(self.G):
-                    Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['G'+str(I+1)][str(alpha)+'Fair']
-                for J in range(2*self.W):
-                    Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['PM'+str(J+1)][str(alpha)+'Fair']
-
-
-               
-                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict)
-                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
-                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
-                Message_Entropy_Vector = Message_Entropy_Vector + ENT       
-            Latency_alpha_Fair.append(End_to_End_Latancy_Vector)
-            Latency_alpha_Fair_T.append(End_to_End_Latancy_Vector_T)
-            Entropy_alpha_Fair.append(Message_Entropy_Vector)
-            
-            
-            
-            
-###########################################LARMIX ##############################   
-        for j in range(5):
-            alpha = j      
-            End_to_End_Latancy_Vector = []
-            End_to_End_Latancy_Vector_T = []
-            Message_Entropy_Vector = []            
-
-            for i in range(len(Dictionaries)):
-                            
-
-                Mix_Dict = {}
-                for I in range(self.G):
-                    Mix_Dict['G'+str(I+1)] = Dictionaries['Iteration'+str(i)]['G'+str(I+1)][str(alpha)+'LARMIX']
-                for J in range(2*self.W):
-                    Mix_Dict['PM'+str(J+1)] = Dictionaries['Iteration'+str(i)]['PM'+str(J+1)][str(alpha)+'LARMIX']
-
-
-
-                Latencies, Latencies_T,ENT = self.Simulator(corrupted_Mix,Mix_Dict)
-                End_to_End_Latancy_Vector =  End_to_End_Latancy_Vector + Latencies
-                End_to_End_Latancy_Vector_T =  End_to_End_Latancy_Vector_T + Latencies_T
-                Message_Entropy_Vector = Message_Entropy_Vector + ENT       
-            Latency_alpha_LARMIX.append(End_to_End_Latancy_Vector)
-            Latency_alpha_LARMIX_T.append(End_to_End_Latancy_Vector_T)
-            Entropy_alpha_LARMIX.append(Message_Entropy_Vector)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-##################################################################################
-##################################################################################
-            
-
-        labels = Alpha  
-###################################################################################            
-#################################Saving the data###################################     
-        df = {'Alpha':labels,
-            'Latency_Uniform' : Latency_alpha_Uniform,
-            'Entropy_Uniform' : Entropy_alpha_Uniform,     
-            'Latency_Fair' : Latency_alpha_Fair,
-            'Entropy_Fair' : Entropy_alpha_Fair, 
-            'Latency_LARMIX' : Latency_alpha_LARMIX,
-            'Entropy_LARMIX' : Entropy_alpha_LARMIX
-                              }
-        import json
-
-        dics = json.dumps(df)
-        with open(File_name + '/' +'Sim.json','w') as df_sim:
-            json.dump(dics,df_sim)        
-        
-        
-        
-        
-    
-##################################Plots##################################################           
-        Y = [Latency_alpha_Uniform ,Latency_alpha_Fair, Latency_alpha_LARMIX ]
-        Y_Label = 'Latency (sec)'
-        X_Label = r'$Radius \alpha = 0.01  $'
-        Name = File_name + '/' + 'Sim_Latency.png'
-        from Plot import PLOT
-        PLT = PLOT(labels,Y,D,X_Label,Y_Label,Name)
-        PLT.Box_Plot(True)
-        
-        
-        Y = [Entropy_alpha_Uniform ,Entropy_alpha_Fair, Entropy_alpha_LARMIX ]
-        Y_Label = 'Entropy (bits)'
-        Name = File_name + '/' +'Sim_Entropy.png'
-        PLT = PLOT(labels,Y,D,X_Label,Y_Label,Name)
-        PLT.Box_Plot(True)
-
-        '''
 
 #############################################################################################
 
     def EL_Analysis_alpha(self,Name_,Iteration,Common = False):
         self.Var = [0.02,0.05,0.1,0.15,0.2,0.3]
-        import numpy as np
-        import json
+
+
         File_name = Name_        
-        import os         
+
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))      
-        import time
+        
         t1 = time.time()
         Dictionaries = self.PreProcessing_(Iteration,Common)
-        #print(time.time()-t1)
+      
         
         Entropy_A = self.Analytic_Entropy(Dictionaries)
         Latency_A1,Latency_A2 = self.Analytic_Latency(Dictionaries)
@@ -1851,7 +1663,7 @@ class CircularMixNet_SC(object):
             Entropy100 = np.matrix(Entropy_A[I])
             f1 = Entropy100/Latency100
             Frac.append(f1.tolist()[0])
-        from Plot import PLOT  
+
         Name_t = File_name + '/'+ 'Throughput.png'        
         Y_t = 'Entropy/Latency'
         X_L = r'$\alpha = 0.02$'
@@ -1876,7 +1688,7 @@ class CircularMixNet_SC(object):
         PLT_L1 = PLOT(Alpha,Latency_A2,DD,X_L,Y_L,Name_Latency_)
 
         PLT_L1.scatter_line(True,0.2)        
-        import pickle        
+     
         df = {'Alpha':Alpha,
             'Latency':Latency_A1,'Entropy':Entropy_A,'Frac':Frac                            
                               
@@ -2008,7 +1820,7 @@ class CircularMixNet_SC(object):
             'Latency_LARMIX' : Latency_alpha_LARMIX,
             'Entropy_LARMIX' : Entropy_alpha_LARMIX
                               }
-        import json
+
 
         dics = json.dumps(df)
         with open(File_name + '/' +'Sim.json','w') as df_sim:
@@ -2023,7 +1835,7 @@ class CircularMixNet_SC(object):
         Y_Label = 'Latency (sec)'
         X_Label = r'$Radius \alpha = 0.01  $'
         Name = File_name + '/' + 'Sim_Latency.png'
-        from Plot import PLOT
+
         PLT = PLOT(labels,Y,D,X_Label,Y_Label,Name)
         PLT.Box_Plot(True)
         
@@ -2081,23 +1893,16 @@ class CircularMixNet_SC(object):
 
     def Load_Analysis(self,Name_,Iteration,Common = False):
 
-        #from Plot import PLOT  
-        #Name_t = File_name + '/'+ 'Throughput.png'        
-        #Y_t = 'Entropy/Latency'
-        #X_L = r'$\alpha = 0.02$'
-        #Y_E = "Entropy (bits)"
-        #Y_L = 'Latency (sec)'
+
         DD = ['Uniform','LARMIX'+ r'$\tau=$' + str(0.9),'Proportional','LARMIX'+r'$\tau=$'+str(0.6),'LARMIX'+r'$\tau=$'+str(0.3)]
         D = ['Uniform','Proportional','LARMix']
         Alpha = [0.001,0.007,0.015,0.03,0.05]        
-        import numpy as np
-        import json
+
         File_name = Name_        
-        import os         
+        import os
         if not os.path.exists(File_name):
             os.mkdir(os.path.join('', File_name))     
-        import pickle
-        import time
+
         t1 = time.time()
         Dictionaries = self.PreProcessing(Iteration,Common)
         t2=time.time()
@@ -2105,20 +1910,13 @@ class CircularMixNet_SC(object):
         
         
         
-       # with open(File_name+'\data.pkl', 'rb') as file:
-            #Dictionaries = pickle.load(file)
-        
+
         Entropy_A,Loads = self.Analytic_Entropy(Dictionaries,True)
 
-        from Plot import PLOT      
 
         X_L = r'$\alpha = 0.02$'
 
         Y_L = "Max Loads"
-        #DD = ['Uniform','LARMIX'+ r'$\tau=$' + str(0.9),'Proportional','LARMIX'+r'$\tau=$'+str(0.6),'LARMIX'+r'$\tau=$'+str(0.3)]       
- 
-        #D = ['Uniform','Proportional','LARMix']
-        #Alpha = [0.0,0.001,0.005,0.01,0.05,0.1]
 
             
         Name_Load = File_name + '/' + str(self.PP[0])+'Load.png'
@@ -2128,12 +1926,12 @@ class CircularMixNet_SC(object):
 
 
      
-        import pickle        
+          
         df = {'Alpha':Alpha,
             'Loads':Loads                          
                               
                               } 
-        #print(Loads)
+
         with open(File_name + '/'+'Analytical_Loads.pkl', 'wb') as file:
             # Serialize and save your data to the file
             pickle.dump(df, file)          
@@ -2153,49 +1951,6 @@ class CircularMixNet_SC(object):
 
 
 
-
-
-
-
-
-
-
-
-
-
-     
-            
-'''          
-                        
- #Exicution###################################################################
-data = 'RIPE'
-W = 64
-
-N = 3*W
-num_gateways = W
-Goal = 'Circle'+str(W)
-delay1 = 0.02
-delay2 = 0.0001
-Capacity = 10000000000000000000000000000000000000000000000000000000000000000
-H_N = round(N/3)
-rate = 100
-num_targets = 200
-Iterations = 5
-run = 0.5
-Percentile = [50,95]
-Sim = CircularMixNet(num_targets,Iterations,Capacity,run,delay1,delay2,H_N,N,rate,num_gateways,Percentile,Goal) 
-
-#A = Sim.PreProcessing(2)
-#print(Sim.Analytic_Latency(A))
-
-#Sim.EL_Analysis('C2',2)
-
-
-#Sim.FCP(5,'FCO_Test_0',True)
-
-#Sim.E2E(0.200,3,'LARMIX'+str(0.9),'Tradeoffs_Test',True)
-
-'''
 
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Mix_Net
+Mix_Net: A Mix-net simulator like NYM network
 """
 
 import numpy  as np
@@ -26,8 +26,6 @@ class MixNet(object):
         #receive the messages and mix dictionaries.
 
         w = self.W
-        #Client = message.client
-        
 
         Pro = np.random.multinomial(1, [1/self.G]*self.G, size=1)[0]
         GG = 'G' + str(Pro.tolist().index(1)+1)
@@ -91,19 +89,7 @@ class MixNet(object):
         M3 = self.M[Next]
         yield self.env.process(M3.Receive_and_send(message))
 
-        
-        #PM3 =  'PM%d' %(Next+1)
-        #G = GW_Dict[PM3]  
-        #print(message.number+'is sent from'+'PM'+str(Next+1)+'to'+G+ 'at'+str(self.env.now))        
-        #GW_delay3 = self.LGW[PM3+G]
-        #yield self.env.timeout(GW_delay3)
-        
-        
-        #G2 = self.GW[G]
-        
-        #yield self.env.process(G2.Receive_and_send(message))        
-        
-        #print('message is out of network and'+G+ 'at'+str(self.env.now))       
+   
         message.mtime.append(self.env.now)#The time of leaving the mix net should be written down
         
         self.LL.append(message.mtime[1]-message.mtime[0])#The latency will be added to the latency list

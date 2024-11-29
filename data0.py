@@ -2,9 +2,10 @@
 
 # -*- coding: utf-8 -*-
 """
-Common Dataset
+Common Dataset: This file creates configurations for mixnets that can be used across all approaches to ensure fair comparisons.
 """
-
+import json
+import numpy as np
 class MakeData(object):
     
     def __init__(self,W,Iteration):
@@ -25,8 +26,7 @@ class MakeData(object):
         GateWays = {}
         Layer = {'Layer1':{},'Layer2':{}}
         GateWays__ = {}
-        import json
-        import numpy as np
+
     
         with open('Interpolated_NYM_250_DEC_2023.json') as json_file: 
         
@@ -104,25 +104,15 @@ class MakeData(object):
             Com_Data['Iteration'+str(i+1)] = [G,L,self.close_data]
             Data_['Iteration'+str(i+1)] = self.close_data
             Com_Data2['Iteration'+str(i+1)] = [self.GG,L,self.close_data]
-        import json
+
         with open('LARMIX__.json','w') as file:
             json.dump(Com_Data,file)
-        import json
+
         with open('LARMIX__2.json','w') as file:
             json.dump(Com_Data2,file)            
-        import json
+
         with open('LARMIX.json','w') as file:
             json.dump(Data_,file)
-                    
-'''
-W = 60
-Iteration = 200
-Class = MakeData(W, Iteration)
-
-Class.Common_Data()
-'''
-
-
 
 
 

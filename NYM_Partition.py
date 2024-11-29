@@ -22,59 +22,7 @@ def Latency_reader(a):
     return float(b)
     
 
-'''
-def data_cleaning(data):
-    List = []
-    for i in range(len(data)):
-        A = data[i]
-        for j in range(len(data)):
-            I_key = data[j]['i_key']
-            if not i == j:
-                x = A['latency_measurements'][str(I_key)]
-                if x=='' or x== '-1':
-                    if not j in List:
-                        List.append(j)
-                
-                   
 
-
-    return List
-    
-                
-                
-        
-
-# Example usage:
-import json
-
-with open('D:/Approach3/ripe_November_12_2023.json') as json_file: 
-
-    data_list = json.load(json_file) # Your list of dictionaries
-    
-    
-
-List = data_cleaning(data_list)
-    
-
-
-new_data = [data_list[i] for i in range(len(data_list)) if not i in List ]
-    
-    
-
-
-    
-print(len(new_data))
-
-
-import json
-
-# Write the data to the JSON file
-with open('D:/Approach3/ripe_November_12_2023_cleaned.json', 'w') as json_file:
-    json.dump(new_data, json_file, indent=4)
-
-
-    '''
-    
     
     
 def Box_Plot_Extraction(A,B,C=True):
@@ -412,65 +360,4 @@ for item in D:
 
 
 
-
-
-
-
-'''
-#############RIPE DATASET ANALYSIS###########################
-
-EU = europe
-
-
-NA = north_america
-
-SA = south_america
-
-
-AS = asia
-
-AF = africa
-
-AU = australia
-
-print(len(africa),len(australia),len(south_america),len(asia))
-
-D = ['NA','SA','AS','EU','AF','AU']
-
-DD = {}
-for item in D:
-    DD[item] = eval(item)
-
-Test_Data = {'Mean':{},'Variance':{}}
-
-for item in D:
-    for term in D:
-        if item == term:
-            pass
-        else:
-            
-            List = Box_Plot_Extraction(DD[item],DD[term],False)
-          
-            Plot_Box(List,[item,term],'D:/Approach3/New_RIPE/' +item+term+'.png')
-
-
-
-
-
-
-EU_ = europe
-
-
-NA_ = north_america
-
-
-c = Distinguish(EU_,NA_)
-print(c)
-eu = [EU_[i] for i in range(len(EU_)) if not i in c ]
-
-
-C_ = Distinguish(NA_,eu)
-print(C_)
-
-'''
 
