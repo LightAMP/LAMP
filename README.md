@@ -1,6 +1,6 @@
 The repository contains code to reproduce results for the paper titled "
 LAMP: Lightweight Approaches for Latency Minimization in Mixnets with
-Practical Deployment Considerations". 
+Practical Deployment Considerations" accepted for publication and to appear in the proceedings of Network and Distributed System Security Symposium (NDSS) 2025 
 
 ## Initial setup and dependencies
 The code can be executed on any standard laptop or desktop device
